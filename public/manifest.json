@@ -1,0 +1,14 @@
+{
+  "short_name": "English Study",
+  "name": "English Study",
+  "icons": [
+    {
+      "src": "logo.svg",
+      "type": "svg"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
