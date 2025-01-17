@@ -122,7 +122,7 @@ export function useCheckAuthStateChanged(successCb?: () => any) {
         if (user) {
           isSuccess = true;
           dispatch(useSetUid({ uid: user.uid }));
-        } else throw Error('인가 확인 실패');
+        } else throw Error('Failed to check auth');
       } catch (error: any) {
         dispatch(useSetUid({ uid: '' }));
         useSetCatchClauseForErrorPopup(error, () =>
@@ -177,91 +177,87 @@ export function useGetDatas(type: string) {
 
 /**
  * 단일 데이터 조회
- * @param {string} type 타입
- * @param {string} id id
  * @returns data
  */
-export function useGetData(type: string, id: string) {
+export function useGetData() {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
   const [data, setData] = useState<any>(null);
 
-  const useGetDataHook = useCallback(async () => {
-    try {
-      dispatch(useSetIsLoading({ isLoading: true }));
+  const useGetDataHook = useCallback(
+    async (type: string, id: string) => {
+      try {
+        dispatch(useSetIsLoading({ isLoading: true }));
 
-      const data = await getDoc(doc(db, type, id));
+        const data = await getDoc(doc(db, type, id));
 
-      if (data !== undefined && data.exists()) setData(data.data());
-      else throw Error('데이터 조회 실패');
-    } catch (error: any) {
-      useSetCatchClauseForErrorPopup(error);
-    } finally {
-      dispatch(useSetIsLoading({ isLoading: false }));
-    }
-  }, [type, id, data]);
+        if (data !== undefined && data.exists()) setData(data.data());
+        else throw Error('Failed to get data');
+      } catch (error: any) {
+        useSetCatchClauseForErrorPopup(error);
+      } finally {
+        dispatch(useSetIsLoading({ isLoading: false }));
+      }
+    },
+    [data]
+  );
 
   return { data, useGetDataHook };
 }
 
 /**
  * 데이터 추가
- * @param {string} type 타입
+ *
+ * @param {Function | undefined} successCb 성공 콜백
  * @returns
  */
-export function useAddData(type: string) {
+export function useAddData(successCb?: Function) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
   const navigate = useNavigate();
   let isSuccess = false;
   let id = '';
 
-  const useAddDataHook = useCallback(
-    async (params: any) => {
-      try {
-        dispatch(useSetIsLoading({ isLoading: true }));
-        id = (await addDoc(collection(db, type), params)).id;
-        isSuccess = true;
-      } catch (error: any) {
-        useSetCatchClauseForErrorPopup(error);
-      } finally {
-        dispatch(useSetIsLoading({ isLoading: false }));
-        if (isSuccess) navigate(`/${type}/${id}`, { replace: true });
-      }
-    },
-    [type]
-  );
+  const useAddDataHook = useCallback(async (params: any) => {
+    try {
+      dispatch(useSetIsLoading({ isLoading: true }));
+      id = (await addDoc(collection(db, params.type), params)).id;
+      isSuccess = true;
+    } catch (error: any) {
+      useSetCatchClauseForErrorPopup(error);
+    } finally {
+      dispatch(useSetIsLoading({ isLoading: false }));
+      if (isSuccess) successCb?.();
+    }
+  }, []);
 
   return useAddDataHook;
 }
 
 /**
  * 데이터 수정
- * @param type 타입
- * @param id 아이디
+ *
+ * @param {Function | undefined} successCb 성공 콜백
  * @returns
  */
-export function useUpdateData(type: string, id: string) {
+export function useUpdateData(successCb?: Function) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
   const navigate = useNavigate();
   let isSuccess = false;
 
-  const useUpdateDataHook = useCallback(
-    async (params: any) => {
-      try {
-        dispatch(useSetIsLoading({ isLoading: true }));
-        await updateDoc(doc(db, type, id), params);
-        isSuccess = true;
-      } catch (error: any) {
-        useSetCatchClauseForErrorPopup(error);
-      } finally {
-        dispatch(useSetIsLoading({ isLoading: false }));
-        if (isSuccess) navigate(`/${type}/${id}`, { replace: true });
-      }
-    },
-    [type, id]
-  );
+  const useUpdateDataHook = useCallback(async (params: any) => {
+    try {
+      dispatch(useSetIsLoading({ isLoading: true }));
+      await updateDoc(doc(db, params.type, params.id), params);
+      isSuccess = true;
+    } catch (error: any) {
+      useSetCatchClauseForErrorPopup(error);
+    } finally {
+      dispatch(useSetIsLoading({ isLoading: false }));
+      if (isSuccess) successCb?.();
+    }
+  }, []);
 
   return useUpdateDataHook;
 }
@@ -272,13 +268,13 @@ export function useUpdateData(type: string, id: string) {
  * @param id 아이디
  * @returns
  */
-export const useDeleteData = (type: string, id: string) => {
+export const useDeleteData = () => {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
   const navigate = useNavigate();
   let isSuccess = false;
 
-  const useDeleteDataHook = useCallback(async () => {
+  const useDeleteDataHook = useCallback(async (type: string, id: string) => {
     try {
       dispatch(useSetIsLoading({ isLoading: true }));
       await deleteDoc(doc(db, type, id));
@@ -289,7 +285,7 @@ export const useDeleteData = (type: string, id: string) => {
       dispatch(useSetIsLoading({ isLoading: false }));
       if (isSuccess) navigate(`/${type}`, { replace: true });
     }
-  }, [type, id]);
+  }, []);
 
   return useDeleteDataHook;
 };

@@ -7,7 +7,7 @@ import styles from './InfoPopup.module.scss';
 
 function mapStateToProps(state: PropState): CommonState {
   return {
-    ...state.common,
+    ...state.common
   };
 }
 
@@ -19,7 +19,7 @@ function InfoPopup({
   isInfoPopupActive,
   infoMessage,
   infoBtnText,
-  useInfoBtnCb,
+  useInfoBtnCb
 }: CommonState): React.JSX.Element {
   return (
     <div
@@ -33,7 +33,7 @@ function InfoPopup({
       <div className={styles.modalBody}>
         <span dangerouslySetInnerHTML={{ __html: infoMessage || '' }} />
         <div>
-          <button onClick={useInfoBtnCb}>{infoBtnText || '확인'}</button>
+          <button onClick={useInfoBtnCb}>{infoBtnText || 'OK'}</button>
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import styles from './ConfirmPopup.module.scss';
 
 function mapStateToProps(state: PropState): CommonState {
   return {
-    ...state.common,
+    ...state.common
   };
 }
 
@@ -21,7 +21,7 @@ function ConfirmPopup({
   confirmBtnText,
   cancelBtnText,
   useConfirmBtnCb,
-  useCancelBtnCb,
+  useCancelBtnCb
 }: CommonState): React.JSX.Element {
   return (
     <div
@@ -35,8 +35,8 @@ function ConfirmPopup({
       <div className={styles.modalBody}>
         <span dangerouslySetInnerHTML={{ __html: message || '' }} />
         <div>
-          <button onClick={useConfirmBtnCb}>{cancelBtnText || '취소'}</button>
-          <button onClick={useCancelBtnCb}>{confirmBtnText || '확인'}</button>
+          <button onClick={useConfirmBtnCb}>{cancelBtnText || 'Cancel'}</button>
+          <button onClick={useCancelBtnCb}>{confirmBtnText || 'OK'}</button>
         </div>
       </div>
     </div>

@@ -24,15 +24,10 @@ function Card({
   title,
   createDt,
   type = '',
-  path
+  onClick,
+  onClickDelete
 }: typeCard): React.JSX.Element {
   const navigate = useNavigate();
-  const useDeleteDataHook = useDeleteData(type, id);
-
-  const handleDeleteBtn = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    useDeleteDataHook();
-  };
 
   const handleUpdateBtn = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -40,7 +35,7 @@ function Card({
   };
 
   return (
-    <div className={styles.wrap} onClick={() => navigate(path)}>
+    <div className={styles.wrap} onClick={(e) => onClick(e, id)}>
       {type && (
         <div className={styles.floatCategory}>
           <span>
@@ -55,7 +50,7 @@ function Card({
           <span onClick={(e) => handleUpdateBtn(e)}>
             <SVG type="modify" width="20px" height="20px" />
           </span>
-          <span onClick={(e) => handleDeleteBtn(e)}>
+          <span onClick={(e) => onClickDelete && onClickDelete(e, id)}>
             <SVG type="trash" width="20px" height="20px" />
           </span>
         </div>
@@ -87,7 +82,11 @@ interface typeCard extends AuthState {
   title: string;
   createDt?: string;
   type?: string;
-  path: string;
+  onClick: (e: React.MouseEvent<HTMLElement, MouseEvent>, id: string) => void;
+  onClickDelete?: (
+    e: React.MouseEvent<HTMLElement, MouseEvent>,
+    id: string
+  ) => void;
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Card);
