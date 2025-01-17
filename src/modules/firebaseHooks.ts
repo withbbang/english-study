@@ -18,7 +18,7 @@ import {
   orderBy
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { auth, db } from 'modules/utils';
+import { auth, db, handleConvertTimestamp } from 'modules/utils';
 import { useSetUid } from 'middlewares/reduxToolkits/authSlice';
 import { useSetIsLoading } from 'middlewares/reduxToolkits/commonSlice';
 import { useSetCatchClauseForErrorPopupHook } from './customHooks';
@@ -143,7 +143,7 @@ export function useCheckAuthStateChanged(successCb?: () => any) {
 export function useGetDatas(type: string) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-  const [data, setData] = useState<any>([]);
+  const [datas, setDatas] = useState<any[]>([]);
 
   const useGetDatasHook = useCallback(async () => {
     try {
@@ -153,14 +153,14 @@ export function useGetDatas(type: string) {
         query(collection(db, type), orderBy('createDt', 'desc'))
       );
 
-      setData(
+      setDatas(
         datas.docs.map((doc) => {
           const { title, createDt, updateDt } = doc.data();
 
           return {
             id: doc.id,
             title,
-            createDt,
+            createDt: handleConvertTimestamp(createDt.toDate(), 'yyyy-MM-dd'),
             updateDt
           };
         })
@@ -170,9 +170,9 @@ export function useGetDatas(type: string) {
     } finally {
       dispatch(useSetIsLoading({ isLoading: false }));
     }
-  }, [type, data]);
+  }, [type, datas]);
 
-  return { data, useGetDatasHook };
+  return { datas, useGetDatasHook };
 }
 
 /**

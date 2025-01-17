@@ -298,12 +298,12 @@ export async function handleSetParamsWithSync(
  */
 export function handleConvertDateFormat(date: Date, format: string): string {
   switch (format) {
-    case 'yyyy-mm-dd':
+    case 'yyyy-MM-dd':
       return `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(
         2,
         '0'
       )}-${`${date.getDate() + 1}`.padStart(2, '0')}`;
-    case 'yyyymmdd':
+    case 'yyyyMMdd':
       return `${date.getFullYear()}${`${date.getMonth() + 1}`.padStart(
         2,
         '0'
@@ -318,6 +318,67 @@ export function handleConvertDateFormat(date: Date, format: string): string {
       )}${handleSetPadZero(date.getMinutes())}${handleSetPadZero(
         date.getSeconds()
       )}`;
+    default:
+      return '';
+  }
+}
+
+/**
+ * timestamp를 원하는 형식으로 반환 함수
+ *
+ * @param {string} timestamp
+ * @param {string} format
+ * @returns {string}
+ */
+export function handleConvertTimestamp(
+  timestamp: string,
+  format: string
+): string {
+  const date = new Date(timestamp);
+
+  console.log(timestamp);
+
+  switch (format) {
+    case 'yyyy-MM-dd':
+      return `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(
+        2,
+        '0'
+      )}-${`${date.getDate() + 1}`.padStart(2, '0')}`;
+    case 'yyyyMMdd':
+      return `${date.getFullYear()}${`${date.getMonth() + 1}`.padStart(
+        2,
+        '0'
+      )}${`${date.getDate() + 1}`.padStart(2, '0')}`;
+    case 'yyyyMMddhhmmss':
+      const handleSetPadZero = (value: number) =>
+        value < 10 ? `0${value}` : value;
+      return `${date.getFullYear()}${handleSetPadZero(
+        date.getMonth() + 1
+      )}${handleSetPadZero(date.getDate())}${handleSetPadZero(
+        date.getHours()
+      )}${handleSetPadZero(date.getMinutes())}${handleSetPadZero(
+        date.getSeconds()
+      )}`;
+    default:
+      return '';
+  }
+}
+
+/**
+ * 타이틀 반환 함수
+ * @param {string} type 타입
+ * @returns {string} 타이틀
+ */
+export function handleGetTitle(type: string): string {
+  switch (type) {
+    case 'diary':
+      return 'Diary';
+    case 'making-use-of':
+      return 'Making Use Of';
+    case 'spoken-language':
+      return 'Spoken Language';
+    case 'vocabulary':
+      return 'vocabulary';
     default:
       return '';
   }
