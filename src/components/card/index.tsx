@@ -50,7 +50,7 @@ function Card({
           </span>
         </div>
       )}
-      {uid !== undefined && uid !== null && uid !== '' ? (
+      {uid !== undefined && uid !== null && uid !== '' && id !== '0' ? (
         <div className={styles.floatBtns}>
           <span onClick={(e) => handleUpdateBtn(e)}>
             <SVG type="modify" width="20px" height="20px" />

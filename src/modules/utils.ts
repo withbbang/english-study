@@ -383,3 +383,13 @@ export function handleGetTitle(type: string): string {
       return '';
   }
 }
+
+/**
+ * 이메일 포맷 검증 함수
+ * @param {string} email 이메일
+ * @returns {boolean}
+ */
+export function handleCheckEmail(email: string): boolean {
+  // eslint-disable-next-line
+  return /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-za-z0-9\-]+/.test(email);
+}
