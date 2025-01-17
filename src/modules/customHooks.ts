@@ -16,7 +16,7 @@ import {
   useSetInfoBtnCb,
   useSetInfoBtnText,
   useSetToastMessage,
-  useSetToastPopupStatus,
+  useSetToastPopupStatus
 } from 'middlewares/reduxToolkits/commonSlice';
 import { getAPI, postAPI } from './apis';
 import {
@@ -25,17 +25,17 @@ import {
   TypeKeyValueForm,
   TypeNormalConfirmPopupHook,
   TypePostAPIByConfirmPopupHook,
-  TypePostAPIHookParams,
+  TypePostAPIHookParams
 } from './types';
 import {
   handleParseDataFromJSInterface,
-  handleSetParamsWithSync,
+  handleSetParamsWithSync
 } from './utils';
 import {
   AfterErrorPopupThenStopLogic,
   BeforeErrorPopupThenNonStopLogic,
   BeforeErrorPopupThenStopLogic,
-  ToastError,
+  ToastError
 } from './customErrorClasses';
 
 /**
@@ -52,16 +52,16 @@ export function useChangeHook(keyValueForm: TypeKeyValueForm) {
       e:
         | React.ChangeEvent<HTMLInputElement>
         | React.ChangeEvent<HTMLTextAreaElement>
-        | React.ChangeEvent<HTMLSelectElement>,
+        | React.ChangeEvent<HTMLSelectElement>
     ) => {
       const { name, value } = e.currentTarget;
 
       setForm((prevState) => ({
         ...prevState,
-        [name]: value,
+        [name]: value
       }));
     },
-    [setForm],
+    [setForm]
   );
 
   return { form, setForm, useChange };
@@ -93,14 +93,14 @@ export function useSetCatchClauseForErrorPopupHook() {
             dispatch(useSetErrorMessage({ errorMessage: '' }));
             dispatch(useSetErrorBtnCb({}));
             errorPopupBtnCb?.(error.code);
-          },
-        }),
+          }
+        })
       );
 
       if (error instanceof AfterErrorPopupThenStopLogic)
         throw new AfterErrorPopupThenStopLogic(error.message);
     },
-    [],
+    []
   );
 
   return useSetCatchClauseForErrorPopup;
@@ -126,11 +126,11 @@ export function useSetInfoPopupHook() {
             dispatch(useSetInfoBtnText({ infoBtnText: '' }));
             dispatch(useSetInfoBtnCb({}));
             infoPopupBtnCb?.();
-          },
-        }),
+          }
+        })
       );
     },
-    [],
+    []
   );
 
   return useSetInfoPopup;
@@ -145,7 +145,7 @@ export function useSetToastPopupHook() {
   const dispatch = useDispatch();
   const [ids, setIds] = useState({
     fstId: -1,
-    scnId: -1,
+    scnId: -1
   });
 
   const useSetToastPopup = useCallback(
@@ -168,10 +168,10 @@ export function useSetToastPopupHook() {
       setIds((prevState) => ({
         ...prevState,
         fstId,
-        scnId,
+        scnId
       }));
     },
-    [ids],
+    [ids]
   );
 
   return useSetToastPopup;
@@ -190,7 +190,7 @@ export function useGetDataHook({
   beforeCb,
   successCb,
   failCb,
-  errorPopupBtnCb,
+  errorPopupBtnCb
 }: TypeGetAPIHookParams) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
@@ -264,7 +264,7 @@ export function usePostDataHook({
   beforeCb,
   successCb,
   failCb,
-  errorPopupBtnCb,
+  errorPopupBtnCb
 }: TypePostAPIHookParams) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
@@ -283,7 +283,7 @@ export function usePostDataHook({
         response = await postAPI(
           url,
           await handleSetParamsWithSync(params),
-          failCb,
+          failCb
         );
         isSuccess = true;
       } catch (error: any) {
@@ -300,7 +300,7 @@ export function usePostDataHook({
         }
       }
     },
-    [url, beforeCb, successCb, failCb, errorPopupBtnCb, data],
+    [url, beforeCb, successCb, failCb, errorPopupBtnCb, data]
   );
 
   return { data, usePostData };
@@ -319,7 +319,7 @@ export function usePostDataByConfirmPopupHook({
   successCb,
   cancelBtnCb,
   failCb,
-  errorPopupBtnCb,
+  errorPopupBtnCb
 }: TypePostAPIByConfirmPopupHook) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
@@ -344,11 +344,11 @@ export function usePostDataByConfirmPopupHook({
               response = await postAPI(
                 url,
                 await handleSetParamsWithSync(params),
-                failCb,
+                failCb
               );
               isSuccess = true;
               dispatch(
-                useSetIsConfirmPopupActive({ isConfirmPopupActive: false }),
+                useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
               );
               dispatch(useSetConfirmBtnText({ confirmBtnText: '' }));
               dispatch(useSetCancelBtnText({ cancelBtnText: '' }));
@@ -367,8 +367,8 @@ export function usePostDataByConfirmPopupHook({
                 dispatch(useSetIsLoading({ isLoading: false }));
               }
             }
-          },
-        }),
+          }
+        })
       );
 
       dispatch(
@@ -376,15 +376,15 @@ export function usePostDataByConfirmPopupHook({
           useCancelBtnCb: () => {
             cancelBtnCb?.();
             dispatch(
-              useSetIsConfirmPopupActive({ isConfirmPopupActive: false }),
+              useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
             );
             dispatch(useSetMessage({ message: '' }));
             dispatch(useSetConfirmBtnText({ confirmBtnText: '' }));
             dispatch(useSetCancelBtnText({ cancelBtnText: '' }));
             dispatch(useSetConfirmBtnCb({}));
             dispatch(useSetCancelBtnCb({}));
-          },
-        }),
+          }
+        })
       );
     },
     [
@@ -396,8 +396,8 @@ export function usePostDataByConfirmPopupHook({
       cancelBtnCb,
       failCb,
       errorPopupBtnCb,
-      data,
-    ],
+      data
+    ]
   );
 
   return { data, useSetActivePostDataByConfirmPopup };
@@ -413,7 +413,7 @@ export function useNormalConfirmPopupHook({
   confirmBtnText,
   cancelBtnText,
   confirmCb,
-  cancelBtnCb,
+  cancelBtnCb
 }: TypeNormalConfirmPopupHook) {
   const dispatch = useDispatch();
 
@@ -433,8 +433,8 @@ export function useNormalConfirmPopupHook({
           dispatch(useSetCancelBtnText({ cancelBtnText: '' }));
           dispatch(useSetConfirmBtnCb({}));
           dispatch(useSetCancelBtnCb({}));
-        },
-      }),
+        }
+      })
     );
 
     dispatch(
@@ -447,8 +447,8 @@ export function useNormalConfirmPopupHook({
           dispatch(useSetCancelBtnText({ cancelBtnText: '' }));
           dispatch(useSetConfirmBtnCb({}));
           dispatch(useSetCancelBtnCb({}));
-        },
-      }),
+        }
+      })
     );
   }, [message, confirmBtnText, cancelBtnText, confirmCb, cancelBtnCb]);
 
@@ -467,7 +467,7 @@ export function useJavascriptInterfaceHook() {
       action,
       data,
       hasCb,
-      isActiveErrorPopup,
+      isActiveErrorPopup
     }: TypeJavascriptInterface) => {
       try {
         return await handleParseDataFromJSInterface({
@@ -475,13 +475,13 @@ export function useJavascriptInterfaceHook() {
           action,
           data,
           hasCb,
-          isActiveErrorPopup,
+          isActiveErrorPopup
         });
       } catch (error: any) {
         return useSetCatchClauseForErrorPopup(error);
       }
     },
-    [],
+    []
   );
 
   return useJavascriptInterface;

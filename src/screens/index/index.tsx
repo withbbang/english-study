@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
 import { PropState } from 'middlewares/configureReducer';
 import { Action } from '@reduxjs/toolkit';
-import { CommonState } from 'middlewares/reduxToolkits/commonSlice';
+import { AuthState } from 'middlewares/reduxToolkits/authSlice';
 import IndexCT from './IndexCT';
 
-function mapStateToProps(state: PropState): CommonState {
-  return { ...state.common };
+function mapStateToProps(state: PropState): AuthState {
+  return { ...state.auth };
 }
 
 function mapDispatchToProps(dispatch: (actionFunction: Action<any>) => any) {

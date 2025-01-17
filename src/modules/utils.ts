@@ -1,9 +1,12 @@
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 import {
   CustomWindow,
   TypeJavascriptInterface,
   TypeKeyValueForm,
   TypeThrowCustomErrorInAPI,
-  TypeThrowErrorInAPI,
+  TypeThrowErrorInAPI
 } from './types';
 import {
   BadGatewayError,
@@ -16,8 +19,30 @@ import {
   NotFoundError,
   RequestTimeoutError,
   ServiceUnavailableError,
-  UnauthorizedError,
+  UnauthorizedError
 } from './customErrorClasses';
+
+/**
+ * firebase 초기화
+ */
+export const app = initializeApp({
+  apiKey: process.env.REACT_APP_FIREBASE_APP_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID
+});
+
+/**
+ * firebase 인가 가져오기
+ */
+export const auth = getAuth(app);
+
+/**
+ * firebase 객체 가져오기
+ */
+export const db = getFirestore(app);
 
 /**
  * [API 상태 코드에 따른 에러 발생 함수]
@@ -28,7 +53,7 @@ import {
 export function handleThrowErrorInAPI({
   status,
   message = 'You should set default error message',
-  failCb,
+  failCb
 }: TypeThrowErrorInAPI) {
   failCb?.();
   switch (status) {
@@ -64,7 +89,7 @@ export function handleThrowErrorInAPI({
 export function handleThrowCustomErrorInAPI({
   code,
   message = 'You should set default error message',
-  failCb,
+  failCb
 }: TypeThrowCustomErrorInAPI) {
   failCb?.(code, message);
   // TODO: 코드에 따라 switch case 분기 필요
@@ -100,7 +125,7 @@ export function handleJavascriptInterfaceForAOS({
   bridge,
   action,
   data,
-  isActiveErrorPopup,
+  isActiveErrorPopup
 }: TypeJavascriptInterface): Promise<any> {
   return new Promise((resolve, reject) => {
     const interfaceNm = bridge as keyof Window;
@@ -113,7 +138,7 @@ export function handleJavascriptInterfaceForAOS({
         if (!isActiveErrorPopup) throw new NativeError();
 
         throw Error(
-          `Native에서 [${interfaceNm} ${action}]와 관련된 데이터를 가져올 수 없습니다.`,
+          `Native에서 [${interfaceNm} ${action}]와 관련된 데이터를 가져올 수 없습니다.`
         );
       }
     } catch (error: any) {
@@ -133,12 +158,12 @@ export function handleJavascriptInterfaceForIOS({
   action,
   data,
   hasCb,
-  isActiveErrorPopup,
+  isActiveErrorPopup
 }: TypeJavascriptInterface): Promise<any> {
   return new Promise((resolve, reject) => {
     const { webkit } = window as CustomWindow;
     const callbackName = `callback${action.replace(/\b[a-z]/, (letter) =>
-      letter.toUpperCase(),
+      letter.toUpperCase()
     )}`;
 
     try {
@@ -148,20 +173,20 @@ export function handleJavascriptInterfaceForIOS({
 
           webkit.messageHandlers[bridge].postMessage({
             action,
-            data,
+            data
           });
         } else
           resolve(
             webkit.messageHandlers[bridge].postMessage({
               action,
-              data,
-            }),
+              data
+            })
           );
       else {
         if (!isActiveErrorPopup) throw new NativeError();
 
         throw Error(
-          `Native에서 [${bridge}]와 관련된 데이터를 가져올 수 없습니다.`,
+          `Native에서 [${bridge}]와 관련된 데이터를 가져올 수 없습니다.`
         );
       }
     } catch (error) {
@@ -181,14 +206,14 @@ export async function handleJavascriptInterface({
   action,
   data,
   hasCb,
-  isActiveErrorPopup,
+  isActiveErrorPopup
 }: TypeJavascriptInterface): Promise<any> {
   if (handleGetOsType() === 'AND')
     return handleJavascriptInterfaceForAOS({
       bridge,
       action,
       data,
-      isActiveErrorPopup,
+      isActiveErrorPopup
     });
 
   if (handleGetOsType() === 'IOS')
@@ -197,7 +222,7 @@ export async function handleJavascriptInterface({
       action,
       data,
       hasCb,
-      isActiveErrorPopup,
+      isActiveErrorPopup
     });
 
   return '';
@@ -214,14 +239,14 @@ export async function handleParseDataFromJSInterface({
   action,
   data,
   hasCb,
-  isActiveErrorPopup,
+  isActiveErrorPopup
 }: TypeJavascriptInterface): Promise<any> {
   const value = await handleJavascriptInterface({
     bridge,
     action,
     data,
     hasCb,
-    isActiveErrorPopup,
+    isActiveErrorPopup
   });
 
   try {
@@ -237,7 +262,7 @@ export async function handleParseDataFromJSInterface({
  * @returns {Promise<TypeKeyValueForm>} resolve된 파라미터 객체
  */
 export async function handleSetParamsWithSync(
-  params: any,
+  params: any
 ): Promise<TypeKeyValueForm> {
   const newParams: TypeKeyValueForm = {};
   const keyArray: string[] = [];
@@ -252,7 +277,7 @@ export async function handleSetParamsWithSync(
         } catch (error: any) {
           reject(error);
         }
-      }),
+      })
     );
   });
 
@@ -276,22 +301,22 @@ export function handleConvertDateFormat(date: Date, format: string): string {
     case 'yyyy-mm-dd':
       return `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(
         2,
-        '0',
+        '0'
       )}-${`${date.getDate() + 1}`.padStart(2, '0')}`;
     case 'yyyymmdd':
       return `${date.getFullYear()}${`${date.getMonth() + 1}`.padStart(
         2,
-        '0',
+        '0'
       )}${`${date.getDate() + 1}`.padStart(2, '0')}`;
     case 'yyyyMMddhhmmss':
       const handleSetPadZero = (value: number) =>
         value < 10 ? `0${value}` : value;
       return `${date.getFullYear()}${handleSetPadZero(
-        date.getMonth() + 1,
+        date.getMonth() + 1
       )}${handleSetPadZero(date.getDate())}${handleSetPadZero(
-        date.getHours(),
+        date.getHours()
       )}${handleSetPadZero(date.getMinutes())}${handleSetPadZero(
-        date.getSeconds(),
+        date.getSeconds()
       )}`;
     default:
       return '';
