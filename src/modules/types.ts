@@ -16,6 +16,17 @@ export interface CustomWindow extends Window {
 }
 
 /**
+ * TTS built in 객체 타입
+ */
+export interface SpeechSynthesisVoice {
+  voiceURI: string;
+  name: string;
+  lang: string;
+  localService: boolean;
+  default: boolean;
+}
+
+/**
  * [API 네트워크 에러가 났을 경우 호출되는 함수(handleThrowErrorInAPI)의 파라미터 타입]
  *
  * @type {number} status: 상태코드

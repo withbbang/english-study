@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { Action } from 'redux';
 import { useGetDatas, useSignOut } from 'modules/firebaseHooks';
 import { useNavigate, useParams } from 'react-router-dom';
+import { handleGetTitle } from 'modules/utils';
 import Back from 'components/back';
 import Card from 'components/card';
-import { handleGetTitle } from 'modules/utils';
 import styles from './CardList.module.scss';
 
 function mapStateToProps(state: PropState): AuthState {

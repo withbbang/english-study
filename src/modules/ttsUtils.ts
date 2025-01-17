@@ -1,3 +1,4 @@
+import { SpeechSynthesisVoice } from 'modules/types';
 import { VOICE, VOICE_LANGUAGE } from './constants';
 
 let voiceList: SpeechSynthesisVoice[] = [];
@@ -29,3 +30,8 @@ export const speech = (text: string) => {
   ) as SpeechSynthesisVoice;
   window.speechSynthesis.speak(utterance);
 };
+
+/**
+ * TTS 끊기
+ */
+export const cancelSpeech = () => window.speechSynthesis.cancel();

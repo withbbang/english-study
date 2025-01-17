@@ -336,8 +336,6 @@ export function handleConvertTimestamp(
 ): string {
   const date = new Date(timestamp);
 
-  console.log(timestamp);
-
   switch (format) {
     case 'yyyy-MM-dd':
       return `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(
