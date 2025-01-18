@@ -20,11 +20,17 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { auth, db, handleConvertTimestamp } from 'modules/utils';
 import { useSetUid } from 'middlewares/reduxToolkits/authSlice';
-import { useSetIsLoading } from 'middlewares/reduxToolkits/commonSlice';
+import {
+  useSetCancelBtnCb,
+  useSetConfirmBtnCb,
+  useSetIsConfirmPopupActive,
+  useSetIsLoading,
+  useSetMessage
+} from 'middlewares/reduxToolkits/commonSlice';
 import { useSetCatchClauseForErrorPopupHook } from './customHooks';
 
 /**
- * 회원가입
+ * [회원가입]
  */
 export function useSignUp() {
   const dispatch = useDispatch();
@@ -49,7 +55,7 @@ export function useSignUp() {
 }
 
 /**
- * 로그인
+ * [로그인]
  */
 export function useSignIn() {
   const dispatch = useDispatch();
@@ -78,7 +84,7 @@ export function useSignIn() {
 }
 
 /**
- * 로그아웃
+ * [로그아웃]
  */
 export function useSignOut() {
   const dispatch = useDispatch();
@@ -106,7 +112,8 @@ export function useSignOut() {
 }
 
 /**
- * 인가 확인
+ * [인가 확인]
+ *
  * @param {Function} successCb 성공 콜백
  */
 export function useCheckAuthStateChanged(successCb?: () => any) {
@@ -137,7 +144,8 @@ export function useCheckAuthStateChanged(successCb?: () => any) {
 }
 
 /**
- * 데이터들 조회
+ * [데이터들 조회]
+ *
  * @param {string} type 타입
  */
 export function useGetDatas(type: string) {
@@ -176,7 +184,8 @@ export function useGetDatas(type: string) {
 }
 
 /**
- * 단일 데이터 조회
+ * [단일 데이터 조회]
+ *
  * @returns data
  */
 export function useGetData() {
@@ -206,7 +215,7 @@ export function useGetData() {
 }
 
 /**
- * 데이터 추가
+ * [데이터 추가]
  *
  * @param {Function | undefined} successCb 성공 콜백
  * @returns
@@ -214,14 +223,12 @@ export function useGetData() {
 export function useAddData(successCb?: Function) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-  const navigate = useNavigate();
   let isSuccess = false;
-  let id = '';
 
   const useAddDataHook = useCallback(async (params: any) => {
     try {
       dispatch(useSetIsLoading({ isLoading: true }));
-      id = (await addDoc(collection(db, params.type), params)).id;
+      await addDoc(collection(db, params.type), params);
       isSuccess = true;
     } catch (error: any) {
       useSetCatchClauseForErrorPopup(error);
@@ -235,7 +242,7 @@ export function useAddData(successCb?: Function) {
 }
 
 /**
- * 데이터 수정
+ * [데이터 수정]
  *
  * @param {Function | undefined} successCb 성공 콜백
  * @returns
@@ -243,7 +250,6 @@ export function useAddData(successCb?: Function) {
 export function useUpdateData(successCb?: Function) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-  const navigate = useNavigate();
   let isSuccess = false;
 
   const useUpdateDataHook = useCallback(async (params: any) => {
@@ -263,15 +269,14 @@ export function useUpdateData(successCb?: Function) {
 }
 
 /**
- * 데이터 삭제
- * @param type 타입
- * @param id 아이디
+ * [데이터 삭제]
+ *
+ * @param {Function | undefined} successCb 성공 콜백
  * @returns
  */
-export const useDeleteData = () => {
+export const useDeleteData = (successCb?: Function) => {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-  const navigate = useNavigate();
   let isSuccess = false;
 
   const useDeleteDataHook = useCallback(async (type: string, id: string) => {
@@ -283,9 +288,67 @@ export const useDeleteData = () => {
       useSetCatchClauseForErrorPopup(error);
     } finally {
       dispatch(useSetIsLoading({ isLoading: false }));
-      if (isSuccess) navigate(`/${type}`, { replace: true });
+      if (isSuccess) successCb?.();
     }
   }, []);
 
   return useDeleteDataHook;
 };
+
+/**
+ * [데이터 추가 팝업 훅]
+ *
+ * @param confirmBtnCb 성공 콜백
+ * @returns
+ */
+export const useAddPopup = (confirmBtnCb: (params?: any) => any) => {
+  const dispatch = useDispatch();
+  const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
+  let isSuccess = false;
+
+  const useAddPopupHook = useCallback(async (type: string, params?: any) => {
+    dispatch(useSetMessage({ message: 'Are you sure you wanna add?' }));
+    dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: true }));
+
+    dispatch(
+      useSetConfirmBtnCb({
+        useConfirmBtnCb: async () => {
+          try {
+            dispatch(useSetIsLoading({ isLoading: true }));
+            await addDoc(collection(db, type), params);
+            isSuccess = true;
+            dispatch(
+              useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
+            );
+            dispatch(useSetConfirmBtnCb({}));
+            dispatch(useSetCancelBtnCb({}));
+          } catch (error: any) {
+            useSetCatchClauseForErrorPopup(error);
+          } finally {
+            dispatch(useSetIsLoading({ isLoading: false }));
+            if (isSuccess) confirmBtnCb?.();
+          }
+        }
+      })
+    );
+
+    dispatch(
+      useSetCancelBtnCb({
+        useCancelBtnCb: () => {
+          dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: false }));
+          dispatch(useSetMessage({ message: '' }));
+          dispatch(useSetConfirmBtnCb({}));
+          dispatch(useSetCancelBtnCb({}));
+        }
+      })
+    );
+  }, []);
+
+  return useAddPopupHook;
+};
+
+// export const useDeletePopup = (confirmBtnCb: Function) => {
+//   const dispatch = useDispatch();
+//   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
+//   let isSuccess = false;
+// };

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { Action } from 'redux';
 import {
   useAddData,
+  useAddPopup,
   useDeleteData,
   useGetData,
   useGetDatas,
@@ -13,11 +14,7 @@ import {
 } from 'modules/firebaseHooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { handleGetTitle } from 'modules/utils';
-import {
-  useChangeHook,
-  useNormalConfirmPopupHook,
-  useSetIsActivePopupHook
-} from 'modules/customHooks';
+import { useChangeHook, useNormalConfirmPopupHook } from 'modules/customHooks';
 import Back from 'components/back';
 import Card from 'components/card';
 import AddUpdateViewPopup from 'components/addUpdateViewPopup/AddUpdateViewPopup';
@@ -42,22 +39,39 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   const useDeleteDataHook = useDeleteData();
   const { datas, useGetDatasHook } = useGetDatas(type);
   const { data, useGetDataHook } = useGetData();
-  const { form, setForm } = useChangeHook({
-    popupMessage: '',
+  const { form, setForm, useChange } = useChangeHook({
+    title: '',
+    contents: '',
+    popupMessage: 'Are you sure you wanna delete?',
     selectedId: '',
     popupType: '',
-    isActivePopup: false
+    isActivePopup: false,
+    xPos: -1,
+    yPos: -1
   });
-  const [confirmBtn, setConfirmBtn] = useState<Function>(() => {});
+  const [confirmBtnCb, setConfirmBtnCb] = useState<Function>(() => {});
   const useNormalConfirmPopup = useNormalConfirmPopupHook({
     message: `${form.popupMessage}` || '',
-    confirmCb: () => confirmBtn()
+    confirmBtnCb: () => confirmBtnCb()
   });
-  const { xPos, yPos, useClickComponent } = useSetIsActivePopupHook();
+  const useAddPopupHook = useAddPopup(() => handleSuccessCb());
 
   useEffect(() => {
     useGetDatasHook();
   }, []);
+
+  const handleSuccessCb = () => {
+    useGetDatasHook();
+    setForm((prevState) => ({
+      ...prevState,
+      title: '',
+      contents: '',
+      popupType: '',
+      isActivePopup: false,
+      xPos: form.x,
+      yPos: form.y
+    }));
+  };
 
   // 카드 클릭 콜백
   const handleClickCard = (
@@ -65,13 +79,32 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
     id: string
   ) => {
     e.stopPropagation();
-    useClickComponent(e);
-    useGetDataHook(type, id);
+    if (id !== '0') useGetDataHook(type, id);
     setForm((prevState) => ({
       ...prevState,
+      popupMessage:
+        id === '0'
+          ? 'Are you sure you wanna add?'
+          : 'Are you sure you wanna delete?',
       selectedId: id,
+      popupType: id === '0' ? 'add' : 'view',
       isActivePopup: true,
-      popupType: id === '0' ? 'view' : 'add'
+      xPos: e.clientX,
+      yPos: e.clientY
+    }));
+  };
+
+  // 카드 닫기
+  const handleCloseCard = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    setForm((prevState) => ({
+      ...prevState,
+      popupMessage: 'Are you sure you wanna delete?',
+      selectedId: '',
+      popupType: '',
+      isActivePopup: false,
+      xPos: e.clientX,
+      yPos: e.clientY,
+      type
     }));
   };
 
@@ -81,12 +114,15 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
     id: string
   ) => {
     e.stopPropagation();
-    useClickComponent(e);
     useGetDataHook(type, id);
     setForm((prevState) => ({
       ...prevState,
+      popupMessage: 'Are you sure you wanna update?',
+      selectedId: id,
       popupType: 'update',
-      selectedId: id
+      isActivePopup: false,
+      xPos: e.clientX,
+      yPos: e.clientY
     }));
   };
 
@@ -96,10 +132,9 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
     id: string
   ) => {
     e.stopPropagation();
-    setConfirmBtn(() => useDeleteDataHook(type, id));
+    setConfirmBtnCb(() => useDeleteDataHook(type, id));
     setForm((prevState) => ({
       ...prevState,
-      popupMessage: 'Are you sure you wanna delete?',
       selectedId: id
     }));
     useNormalConfirmPopup();
@@ -111,38 +146,24 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   ) => {
     e.stopPropagation();
 
-    let popupMessage = '';
-
-    if (form.popupType === 'add') {
-      popupMessage = 'Are you sure you wanna add?';
-      setConfirmBtn(() => useAddDataHook(form));
-    } else if (form.popupType === 'update') {
-      popupMessage = 'Are you sure you wanna update?';
-      setConfirmBtn(() => useUpdateDataHook(form));
-    } else {
-      setForm((prevState) => ({
-        ...prevState,
-        popupMessage,
-        isActivePopup: false
-      }));
-      return;
-    }
-
-    setForm((prevState) => ({
-      ...prevState,
-      popupMessage,
-      isActivePopup: false
-    }));
-    useNormalConfirmPopup();
+    useAddPopupHook(type, {
+      title: form.title,
+      contents: form.contents,
+      createDt: new Date()
+    });
   };
 
   return (
     <>
       <AddUpdateViewPopup
-        isActive={!!form.isActivePopup}
-        xPos={xPos}
-        yPos={yPos}
+        title={`${form.title}`}
+        contents={`${form.contents}`}
         popupType={`${form.popupType}`}
+        isActive={!!form.isActivePopup}
+        xPos={+form.xPos}
+        yPos={+form.yPos}
+        useChange={useChange}
+        onCloseCard={handleCloseCard}
         onClick={handleAddUpdateOkBtn}
       />
       <div className={styles.wrap}>
@@ -175,6 +196,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
                 createDt={createDt}
                 type={type}
                 onClick={handleClickCard}
+                onClickUpdate={handleClickUpdate}
                 onClickDelete={handleClickDelete}
               />
             ))}

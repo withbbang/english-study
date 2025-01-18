@@ -118,14 +118,14 @@ export interface TypePostAPIByConfirmPopupHook {
  * @type {string} message: 팝업 메세지
  * @type {string | undefined} confirmBtnText: 확인 팝업의 확인 버튼 텍스트
  * @type {string | undefined} cancelBtnText: 확인 팝업의 취소 버튼 텍스트
- * @type {Function | undefined} confirmCb: 확인 팝업 확인 버튼 콜백
+ * @type {Function | undefined} confirmBtnCb: 확인 팝업 확인 버튼 콜백
  * @type {Function | undefined} cancelBtnCb: 확인 팝업 취소 버튼 콜백
  */
 export interface TypeNormalConfirmPopupHook {
   message: string;
   confirmBtnText?: string;
   cancelBtnText?: string;
-  confirmCb?: () => any;
+  confirmBtnCb?: () => any;
   cancelBtnCb?: () => any;
 }
 

@@ -35,8 +35,8 @@ function ConfirmPopup({
       <div className={styles.modalBody}>
         <span dangerouslySetInnerHTML={{ __html: message || '' }} />
         <div>
-          <button onClick={useConfirmBtnCb}>{cancelBtnText || 'Cancel'}</button>
-          <button onClick={useCancelBtnCb}>{confirmBtnText || 'OK'}</button>
+          <button onClick={useCancelBtnCb}>{cancelBtnText || 'Cancel'}</button>
+          <button onClick={useConfirmBtnCb}>{confirmBtnText || 'OK'}</button>
         </div>
       </div>
     </div>

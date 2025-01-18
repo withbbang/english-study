@@ -25,15 +25,9 @@ function Card({
   createDt,
   type = '',
   onClick,
+  onClickUpdate,
   onClickDelete
 }: typeCard): React.JSX.Element {
-  const navigate = useNavigate();
-
-  const handleUpdateBtn = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/diagram/${type}/update/${id}`);
-  };
-
   return (
     <div className={styles.wrap} onClick={(e) => onClick(e, id)}>
       {type && (
@@ -47,7 +41,7 @@ function Card({
       )}
       {uid !== undefined && uid !== null && uid !== '' && id !== '0' ? (
         <div className={styles.floatBtns}>
-          <span onClick={(e) => handleUpdateBtn(e)}>
+          <span onClick={(e) => onClickUpdate && onClickUpdate(e, id)}>
             <SVG type="modify" width="20px" height="20px" />
           </span>
           <span onClick={(e) => onClickDelete && onClickDelete(e, id)}>
@@ -83,6 +77,10 @@ interface typeCard extends AuthState {
   createDt?: string;
   type?: string;
   onClick: (e: React.MouseEvent<HTMLElement, MouseEvent>, id: string) => void;
+  onClickUpdate?: (
+    e: React.MouseEvent<HTMLElement, MouseEvent>,
+    id: string
+  ) => void;
   onClickDelete?: (
     e: React.MouseEvent<HTMLElement, MouseEvent>,
     id: string

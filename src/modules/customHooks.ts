@@ -198,26 +198,6 @@ export function useSetToastPopupHook() {
 }
 
 /**
- * [팝업 상태 관리 훅]
- *
- * @returns
- */
-export function useSetIsActivePopupHook() {
-  const [xPos, setXPos] = useState<number | undefined>();
-  const [yPos, setYPos] = useState<number | undefined>();
-
-  const useClickComponent = useCallback(
-    (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      setXPos(e.clientX);
-      setYPos(e.clientY);
-    },
-    [xPos, yPos]
-  );
-
-  return { xPos, yPos, useClickComponent };
-}
-
-/**
  * [get method 커스텀 훅]
  *
  * @param {TypeGetAPIHookParams} params
@@ -452,7 +432,7 @@ export function useNormalConfirmPopupHook({
   message,
   confirmBtnText,
   cancelBtnText,
-  confirmCb,
+  confirmBtnCb,
   cancelBtnCb
 }: TypeNormalConfirmPopupHook) {
   const dispatch = useDispatch();
@@ -466,7 +446,7 @@ export function useNormalConfirmPopupHook({
     dispatch(
       useSetConfirmBtnCb({
         useConfirmBtnCb: () => {
-          confirmCb?.();
+          confirmBtnCb?.();
           dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: false }));
           dispatch(useSetMessage({ message: '' }));
           dispatch(useSetConfirmBtnText({ confirmBtnText: '' }));
@@ -490,7 +470,7 @@ export function useNormalConfirmPopupHook({
         }
       })
     );
-  }, [message, confirmBtnText, cancelBtnText, confirmCb, cancelBtnCb]);
+  }, [message, confirmBtnText, cancelBtnText, confirmBtnCb, cancelBtnCb]);
 
   return useNormalConfirmPopup;
 }

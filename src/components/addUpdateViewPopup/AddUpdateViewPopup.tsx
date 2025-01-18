@@ -4,10 +4,14 @@ import { useChangeHook } from 'modules/customHooks';
 import styles from './AddUpdateViewPopup.module.scss';
 
 function AddUpdateViewPopup({
+  title,
+  contents,
   isActive,
   popupType,
   xPos,
   yPos,
+  useChange,
+  onCloseCard,
   onClick
 }: TypeAddUpdateViewPopup): React.JSX.Element {
   const divRef = React.useRef(
@@ -17,29 +21,10 @@ function AddUpdateViewPopup({
     null
   ) as React.MutableRefObject<HTMLTextAreaElement | null>;
 
-  const { form, setForm, useChange } = useChangeHook({
-    title: '',
-    url: '',
-    description: ``,
-    category: 0,
-    degreeOfUnderstanding: 20,
-    bookmark: 'N'
-  });
-
-  React.useEffect(() => {
-    if (isActive) {
-      handleActivePopup();
-    } else {
-      handleInActivePopup();
-    }
-  }, [isActive]);
-
   useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = 'auto';
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
-    }
-  }, [form.description]);
+    if (isActive) handleActivePopup();
+    else handleInActivePopup();
+  }, [isActive]);
 
   // 팝업 활성
   const handleActivePopup = () => {
@@ -80,7 +65,7 @@ function AddUpdateViewPopup({
             ? [styles.background, styles.isActive].join(' ')
             : styles.background
         }
-        onClick={(e) => onClick(e)}
+        onClick={onCloseCard}
       />
       <div
         className={
@@ -97,20 +82,20 @@ function AddUpdateViewPopup({
             <input
               id="title"
               name="title"
-              value={`${form.title}`}
+              value={`${title}`}
               onChange={useChange}
               disabled={popupType === 'view'}
             />
           </label>
         </div>
         <div className={styles.content}>
-          <label htmlFor="description">
-            Description
+          <label htmlFor="contents">
+            Contents
             <br />
             <textarea
-              name="description"
+              name="contents"
               ref={textAreaRef}
-              value={`${form.description}`}
+              value={`${contents}`}
               onChange={useChange}
               disabled={popupType === 'view'}
             />
@@ -125,10 +110,19 @@ function AddUpdateViewPopup({
 }
 
 interface TypeAddUpdateViewPopup {
+  title: string;
+  contents: string;
   isActive: boolean;
   popupType?: string;
   xPos?: number;
   yPos?: number;
+  useChange: (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) => void;
+  onCloseCard: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   onClick: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }
 
