@@ -54,6 +54,10 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   const { form, setForm, useChange } = useChangeHook({
     title: '',
     contents: '',
+    'en-en': '',
+    'en-ko': '',
+    examples: '',
+    example: '',
     selectedId: '',
     popupType: '',
     isActivePopup: false,
@@ -63,17 +67,33 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   });
 
   useEffect(() => {
-    useGetDatasHook();
-    ttsInit();
+    if (
+      !(
+        type === 'diary' ||
+        type === 'making-use-of' ||
+        type === 'spoken-language' ||
+        type === 'vocabulary'
+      )
+    )
+      navigate('/not-found', { replace: true });
+    else {
+      useGetDatasHook();
+      ttsInit();
+    }
   }, []);
 
   // api 호출 후 콜백
   const handleSuccessCb = () => {
     useGetDatasHook();
+    stopSpeech();
     setForm((prevState) => ({
       ...prevState,
       title: '',
       contents: '',
+      'en-en': '',
+      'en-ko': '',
+      examples: '',
+      example: '',
       selectedId: '',
       popupType: '',
       isActivePopup: false,
@@ -108,6 +128,10 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       ...prevState,
       title: '',
       contents: '',
+      'en-en': '',
+      'en-ko': '',
+      examples: '',
+      example: '',
       selectedId: '',
       popupType: '',
       isActivePopup: false,
@@ -123,19 +147,41 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   ) => {
     e.stopPropagation();
 
-    if (form.popupType === 'add')
-      useAddPopupHook(type, {
+    let params: any;
+
+    if (type === 'diary')
+      params = {
         title: form.title,
-        contents: form.contents,
-        createDt: new Date()
-      });
-    else if (form.popupType === 'update')
-      useUpdatePopupHook(type, `${form.selectedId}`, {
+        contents: form.contents
+      };
+    else if (type === 'making-use-of')
+      params = {
         title: form.title,
-        contents: form.contents,
-        updateDt: new Date()
-      });
-    else handleCloseCard(e);
+        'en-en': form['en-en'],
+        'en-ko': form['en-ko'],
+        examples: form.examples
+      };
+    else if (type === 'spoken-language')
+      params = {
+        title: form.title,
+        'en-en': form['en-en'],
+        'en-ko': form['en-ko'],
+        example: form.example
+      };
+    else if (type === 'vocabulary')
+      params = {
+        title: form.title,
+        'en-en': form['en-en'],
+        'en-ko': form['en-ko']
+      };
+
+    if (form.popupType === 'add') {
+      params.createDt = new Date();
+      useAddPopupHook(type, params);
+    } else if (form.popupType === 'update') {
+      params.updateDt = new Date();
+      useUpdatePopupHook(type, `${form.selectedId}`, params);
+    } else handleCloseCard(e);
   };
 
   // 삭제 버튼 콜백
