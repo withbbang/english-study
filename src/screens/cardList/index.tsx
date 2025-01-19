@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { PropState } from 'middlewares/configureReducer';
 import { AuthState } from 'middlewares/reduxToolkits/authSlice';
 import { connect } from 'react-redux';
 import { Action } from 'redux';
 import {
-  useAddData,
   useAddPopup,
-  useDeleteData,
   useDeletePopup,
   useGetData,
   useGetDatas,
   useSignOut,
-  useUpdateData,
   useUpdatePopup
 } from 'modules/firebaseHooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { handleGetTitle } from 'modules/utils';
-import { useChangeHook, useNormalConfirmPopupHook } from 'modules/customHooks';
+import { useChangeHook } from 'modules/customHooks';
+import {
+  stopSpeech,
+  startSpeech,
+  splitContents,
+  ttsInit
+} from 'modules/ttsUtils';
 import Back from 'components/back';
 import Card from 'components/card';
 import AddUpdateViewPopup from 'components/addUpdateViewPopup/AddUpdateViewPopup';
@@ -55,11 +58,13 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
     popupType: '',
     isActivePopup: false,
     xPos: -1,
-    yPos: -1
+    yPos: -1,
+    doesTtsWork: false
   });
 
   useEffect(() => {
     useGetDatasHook();
+    ttsInit();
   }, []);
 
   // api 호출 후 콜백
@@ -98,6 +103,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
 
   // 카드 닫기
   const handleCloseCard = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    stopSpeech();
     setForm((prevState) => ({
       ...prevState,
       title: '',
@@ -106,7 +112,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       popupType: '',
       isActivePopup: false,
       xPos: e.clientX,
-      yPos: e.clientY
+      yPos: e.clientY,
+      doesTtsWork: false
     }));
   };
 
@@ -141,6 +148,24 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
     useDeletePopupHook(type, id);
   };
 
+  // tts 시작
+  const handleStartSpeech = () => {
+    if (!form.doesTtsWork)
+      splitContents(`${form.contents}`).forEach((text) =>
+        startSpeech(
+          text,
+          () => setForm((prevState) => ({ ...prevState, doesTtsWork: true })),
+          () => setForm((prevState) => ({ ...prevState, doesTtsWork: false }))
+        )
+      );
+  };
+
+  // tts 정지
+  const handleStopSpeech = () => {
+    setForm((prevState) => ({ ...prevState, doesTtsWork: false }));
+    stopSpeech();
+  };
+
   return (
     <>
       <AddUpdateViewPopup
@@ -153,6 +178,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
         useChange={useChange}
         onCloseCard={handleCloseCard}
         onClick={handleAddUpdateOkBtn}
+        onStartSpeech={handleStartSpeech}
+        onStopSpeech={handleStopSpeech}
       />
       <div className={styles.wrap}>
         <Back />

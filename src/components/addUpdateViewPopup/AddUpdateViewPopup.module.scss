@@ -38,10 +38,6 @@
     align-items: center;
     box-sizing: border-box;
 
-    &:not(:last-of-type) {
-      margin-bottom: 10px;
-    }
-
     > label {
       width: 100%;
       text-align: start;
@@ -63,17 +59,33 @@
 
       > textarea {
         display: flex;
-        height: 40%;
+        height: 200px;
         overflow-y: hidden;
       }
     }
   }
 
-  .contents {
+  .content {
     justify-content: space-between;
 
     > label {
-      width: 45%;
+      width: 100%;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .btns {
+    justify-content: space-evenly;
+
+    .ttsBtns {
+      > span {
+        margin-right: 10px;
+        cursor: pointer;
+      }
     }
 
     > button {

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import SVG from 'modules/SVG';
 import styles from './AddUpdateViewPopup.module.scss';
 
 function AddUpdateViewPopup({
@@ -10,7 +11,9 @@ function AddUpdateViewPopup({
   yPos,
   useChange,
   onCloseCard,
-  onClick
+  onClick,
+  onStartSpeech,
+  onStopSpeech
 }: TypeAddUpdateViewPopup): React.JSX.Element {
   const divRef = React.useRef(
     null
@@ -74,9 +77,8 @@ function AddUpdateViewPopup({
         ref={divRef}
       >
         <div className={styles.content}>
-          <label htmlFor="title">
-            Title
-            <br />
+          <label htmlFor="title" className={styles.title}>
+            Title&nbsp;&nbsp;&nbsp;
             <input
               id="title"
               name="title"
@@ -99,7 +101,15 @@ function AddUpdateViewPopup({
             />
           </label>
         </div>
-        <div className={styles.contents}>
+        <div className={styles.btns}>
+          <div className={styles.ttsBtns}>
+            <span onClick={onStartSpeech}>
+              <SVG type="play" width="30px" height="30px" />
+            </span>
+            <span onClick={onStopSpeech}>
+              <SVG type="stop" width="30px" height="30px" />
+            </span>
+          </div>
           <button onClick={onClick}>OK</button>
         </div>
       </div>
@@ -122,6 +132,8 @@ interface TypeAddUpdateViewPopup {
   ) => void;
   onCloseCard: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   onClick: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+  onStartSpeech: () => void;
+  onStopSpeech: () => void;
 }
 
 export default AddUpdateViewPopup;

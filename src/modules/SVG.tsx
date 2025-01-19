@@ -26,6 +26,32 @@ function SVG({
           />
         </svg>
       );
+    case 'play':
+      return (
+        <svg
+          fill={fill !== undefined ? fill : '#000'}
+          width={width !== undefined ? width : '35px'}
+          height={height !== undefined ? height : '35px'}
+          viewBox="0 0 32 32"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M5.92 24.096q0 1.088 0.928 1.728 0.512 0.288 1.088 0.288 0.448 0 0.896-0.224l16.16-8.064q0.48-0.256 0.8-0.736t0.288-1.088-0.288-1.056-0.8-0.736l-16.16-8.064q-0.448-0.224-0.896-0.224-0.544 0-1.088 0.288-0.928 0.608-0.928 1.728v16.16z"></path>
+        </svg>
+      );
+    case 'stop':
+      return (
+        <svg
+          fill={fill !== undefined ? fill : '#000'}
+          width={width !== undefined ? width : '35px'}
+          height={height !== undefined ? height : '35px'}
+          viewBox="0 0 32 32"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M5.92 24.096q0 0.832 0.576 1.408t1.44 0.608h16.128q0.832 0 1.44-0.608t0.576-1.408v-16.16q0-0.832-0.576-1.44t-1.44-0.576h-16.128q-0.832 0-1.44 0.576t-0.576 1.44v16.16z"></path>
+        </svg>
+      );
     case 'time':
       return (
         <svg

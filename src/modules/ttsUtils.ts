@@ -21,8 +21,15 @@ export const ttsInit = () => {
  * TTS 수행
  * @param text 입력 텍스트
  */
-export const speech = (text: string) => {
+export const startSpeech = (
+  text: string,
+  startCb: () => void,
+  stopCb: () => void
+) => {
   const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.onstart = startCb;
+  utterance.onend = stopCb;
 
   utterance.lang = VOICE_LANGUAGE;
   utterance.voice = voiceList.find(
@@ -32,6 +39,8 @@ export const speech = (text: string) => {
 };
 
 /**
- * TTS 끊기
+ * TTS 정지
  */
-export const cancelSpeech = () => window.speechSynthesis.cancel();
+export const stopSpeech = () => window.speechSynthesis.cancel();
+
+export const splitContents = (contents: string) => contents.split(/[,|\n]/);
