@@ -7,10 +7,12 @@ import {
   useAddData,
   useAddPopup,
   useDeleteData,
+  useDeletePopup,
   useGetData,
   useGetDatas,
   useSignOut,
-  useUpdateData
+  useUpdateData,
+  useUpdatePopup
 } from 'modules/firebaseHooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { handleGetTitle } from 'modules/utils';
@@ -34,38 +36,40 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   const { type = '' } = useParams();
   const navigate = useNavigate();
   const useSignOutHook = useSignOut();
-  const useAddDataHook = useAddData();
-  const useUpdateDataHook = useUpdateData();
-  const useDeleteDataHook = useDeleteData();
+  const useAddPopupHook = useAddPopup(() => handleSuccessCb());
+  const useUpdatePopupHook = useUpdatePopup(() => handleSuccessCb());
+  const useDeletePopupHook = useDeletePopup(() => handleSuccessCb());
   const { datas, useGetDatasHook } = useGetDatas(type);
-  const { data, useGetDataHook } = useGetData();
+  const { useGetDataHook } = useGetData((response) => {
+    console.log(response);
+    setForm((prevState) => ({
+      ...prevState,
+      title: response.title,
+      contents: response.contents
+    }));
+  });
   const { form, setForm, useChange } = useChangeHook({
     title: '',
     contents: '',
-    popupMessage: 'Are you sure you wanna delete?',
     selectedId: '',
     popupType: '',
     isActivePopup: false,
     xPos: -1,
     yPos: -1
   });
-  const [confirmBtnCb, setConfirmBtnCb] = useState<Function>(() => {});
-  const useNormalConfirmPopup = useNormalConfirmPopupHook({
-    message: `${form.popupMessage}` || '',
-    confirmBtnCb: () => confirmBtnCb()
-  });
-  const useAddPopupHook = useAddPopup(() => handleSuccessCb());
 
   useEffect(() => {
     useGetDatasHook();
   }, []);
 
+  // api 호출 후 콜백
   const handleSuccessCb = () => {
     useGetDatasHook();
     setForm((prevState) => ({
       ...prevState,
       title: '',
       contents: '',
+      selectedId: '',
       popupType: '',
       isActivePopup: false,
       xPos: form.x,
@@ -76,18 +80,16 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   // 카드 클릭 콜백
   const handleClickCard = (
     e: React.MouseEvent<HTMLElement, MouseEvent>,
-    id: string
+    id: string,
+    popupType: string
   ) => {
     e.stopPropagation();
+
     if (id !== '0') useGetDataHook(type, id);
     setForm((prevState) => ({
       ...prevState,
-      popupMessage:
-        id === '0'
-          ? 'Are you sure you wanna add?'
-          : 'Are you sure you wanna delete?',
       selectedId: id,
-      popupType: id === '0' ? 'add' : 'view',
+      popupType,
       isActivePopup: true,
       xPos: e.clientX,
       yPos: e.clientY
@@ -98,46 +100,14 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   const handleCloseCard = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setForm((prevState) => ({
       ...prevState,
-      popupMessage: 'Are you sure you wanna delete?',
+      title: '',
+      contents: '',
       selectedId: '',
       popupType: '',
       isActivePopup: false,
       xPos: e.clientX,
-      yPos: e.clientY,
-      type
-    }));
-  };
-
-  // 수정 svg 콜백
-  const handleClickUpdate = (
-    e: React.MouseEvent<HTMLElement, MouseEvent>,
-    id: string
-  ) => {
-    e.stopPropagation();
-    useGetDataHook(type, id);
-    setForm((prevState) => ({
-      ...prevState,
-      popupMessage: 'Are you sure you wanna update?',
-      selectedId: id,
-      popupType: 'update',
-      isActivePopup: false,
-      xPos: e.clientX,
       yPos: e.clientY
     }));
-  };
-
-  // 삭제 svg 콜백
-  const handleClickDelete = (
-    e: React.MouseEvent<HTMLElement, MouseEvent>,
-    id: string
-  ) => {
-    e.stopPropagation();
-    setConfirmBtnCb(() => useDeleteDataHook(type, id));
-    setForm((prevState) => ({
-      ...prevState,
-      selectedId: id
-    }));
-    useNormalConfirmPopup();
   };
 
   // 추가, 수정 버튼 콜백
@@ -146,11 +116,29 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   ) => {
     e.stopPropagation();
 
-    useAddPopupHook(type, {
-      title: form.title,
-      contents: form.contents,
-      createDt: new Date()
-    });
+    if (form.popupType === 'add')
+      useAddPopupHook(type, {
+        title: form.title,
+        contents: form.contents,
+        createDt: new Date()
+      });
+    else if (form.popupType === 'update')
+      useUpdatePopupHook(type, `${form.selectedId}`, {
+        title: form.title,
+        contents: form.contents,
+        updateDt: new Date()
+      });
+    else handleCloseCard(e);
+  };
+
+  // 삭제 버튼 콜백
+  const handleClickDelete = (
+    e: React.MouseEvent<HTMLElement, MouseEvent>,
+    id: string
+  ) => {
+    e.stopPropagation();
+
+    useDeletePopupHook(type, id);
   };
 
   return (
@@ -196,7 +184,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
                 createDt={createDt}
                 type={type}
                 onClick={handleClickCard}
-                onClickUpdate={handleClickUpdate}
+                onClickUpdate={handleClickCard}
                 onClickDelete={handleClickDelete}
               />
             ))}

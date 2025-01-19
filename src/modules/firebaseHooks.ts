@@ -146,9 +146,10 @@ export function useCheckAuthStateChanged(successCb?: () => any) {
 /**
  * [데이터들 조회]
  *
+ * @param {Function | undefined} successCb 성공 콜백
  * @param {string} type 타입
  */
-export function useGetDatas(type: string) {
+export function useGetDatas(type: string, successCb?: (response?: any) => any) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
   const [datas, setDatas] = useState<any[]>([]);
@@ -161,18 +162,19 @@ export function useGetDatas(type: string) {
         query(collection(db, type), orderBy('createDt', 'desc'))
       );
 
-      setDatas(
-        datas.docs.map((doc) => {
-          const { title, createDt, updateDt } = doc.data();
+      const response = datas.docs.map((doc) => {
+        const { title, createDt, updateDt } = doc.data();
 
-          return {
-            id: doc.id,
-            title,
-            createDt: handleConvertTimestamp(createDt.toDate(), 'yyyy-MM-dd'),
-            updateDt
-          };
-        })
-      );
+        return {
+          id: doc.id,
+          title,
+          createDt: handleConvertTimestamp(createDt.toDate(), 'yyyy-MM-dd'),
+          updateDt
+        };
+      });
+
+      setDatas(response);
+      successCb?.(response);
     } catch (error: any) {
       useSetCatchClauseForErrorPopup(error);
     } finally {
@@ -186,9 +188,10 @@ export function useGetDatas(type: string) {
 /**
  * [단일 데이터 조회]
  *
+ * @param {Function | undefined} successCb 성공 콜백
  * @returns data
  */
-export function useGetData() {
+export function useGetData(successCb?: (response?: any) => any) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
   const [data, setData] = useState<any>(null);
@@ -198,10 +201,12 @@ export function useGetData() {
       try {
         dispatch(useSetIsLoading({ isLoading: true }));
 
-        const data = await getDoc(doc(db, type, id));
+        const response = await getDoc(doc(db, type, id));
 
-        if (data !== undefined && data.exists()) setData(data.data());
-        else throw Error('Failed to get data');
+        if (response !== undefined && response.exists()) {
+          setData(response.data());
+          successCb?.(response.data());
+        } else throw Error('Failed to get data');
       } catch (error: any) {
         useSetCatchClauseForErrorPopup(error);
       } finally {
@@ -223,18 +228,16 @@ export function useGetData() {
 export function useAddData(successCb?: Function) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-  let isSuccess = false;
 
   const useAddDataHook = useCallback(async (params: any) => {
     try {
       dispatch(useSetIsLoading({ isLoading: true }));
       await addDoc(collection(db, params.type), params);
-      isSuccess = true;
+      successCb?.();
     } catch (error: any) {
       useSetCatchClauseForErrorPopup(error);
     } finally {
       dispatch(useSetIsLoading({ isLoading: false }));
-      if (isSuccess) successCb?.();
     }
   }, []);
 
@@ -250,18 +253,16 @@ export function useAddData(successCb?: Function) {
 export function useUpdateData(successCb?: Function) {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-  let isSuccess = false;
 
   const useUpdateDataHook = useCallback(async (params: any) => {
     try {
       dispatch(useSetIsLoading({ isLoading: true }));
       await updateDoc(doc(db, params.type, params.id), params);
-      isSuccess = true;
+      successCb?.();
     } catch (error: any) {
       useSetCatchClauseForErrorPopup(error);
     } finally {
       dispatch(useSetIsLoading({ isLoading: false }));
-      if (isSuccess) successCb?.();
     }
   }, []);
 
@@ -277,18 +278,16 @@ export function useUpdateData(successCb?: Function) {
 export const useDeleteData = (successCb?: Function) => {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-  let isSuccess = false;
 
   const useDeleteDataHook = useCallback(async (type: string, id: string) => {
     try {
       dispatch(useSetIsLoading({ isLoading: true }));
       await deleteDoc(doc(db, type, id));
-      isSuccess = true;
+      successCb?.();
     } catch (error: any) {
       useSetCatchClauseForErrorPopup(error);
     } finally {
       dispatch(useSetIsLoading({ isLoading: false }));
-      if (isSuccess) successCb?.();
     }
   }, []);
 
@@ -304,7 +303,6 @@ export const useDeleteData = (successCb?: Function) => {
 export const useAddPopup = (confirmBtnCb: (params?: any) => any) => {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-  let isSuccess = false;
 
   const useAddPopupHook = useCallback(async (type: string, params?: any) => {
     dispatch(useSetMessage({ message: 'Are you sure you wanna add?' }));
@@ -316,17 +314,16 @@ export const useAddPopup = (confirmBtnCb: (params?: any) => any) => {
           try {
             dispatch(useSetIsLoading({ isLoading: true }));
             await addDoc(collection(db, type), params);
-            isSuccess = true;
             dispatch(
               useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
             );
             dispatch(useSetConfirmBtnCb({}));
             dispatch(useSetCancelBtnCb({}));
+            confirmBtnCb?.();
           } catch (error: any) {
             useSetCatchClauseForErrorPopup(error);
           } finally {
             dispatch(useSetIsLoading({ isLoading: false }));
-            if (isSuccess) confirmBtnCb?.();
           }
         }
       })
@@ -347,8 +344,107 @@ export const useAddPopup = (confirmBtnCb: (params?: any) => any) => {
   return useAddPopupHook;
 };
 
-// export const useDeletePopup = (confirmBtnCb: Function) => {
-//   const dispatch = useDispatch();
-//   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
-//   let isSuccess = false;
-// };
+/**
+ * [데이터 갱신 팝업 훅]
+ *
+ * @param confirmBtnCb 성공 콜백
+ * @returns
+ */
+export const useUpdatePopup = (confirmBtnCb: (params?: any) => any) => {
+  const dispatch = useDispatch();
+  const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
+
+  const useUpdatePopupHook = useCallback(
+    async (type: string, id: string, params?: any) => {
+      dispatch(useSetMessage({ message: 'Are you sure you wanna update?' }));
+      dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: true }));
+
+      dispatch(
+        useSetConfirmBtnCb({
+          useConfirmBtnCb: async () => {
+            try {
+              dispatch(useSetIsLoading({ isLoading: true }));
+              await updateDoc(doc(db, type, id), params);
+              dispatch(
+                useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
+              );
+              dispatch(useSetConfirmBtnCb({}));
+              dispatch(useSetCancelBtnCb({}));
+              confirmBtnCb?.();
+            } catch (error: any) {
+              useSetCatchClauseForErrorPopup(error);
+            } finally {
+              dispatch(useSetIsLoading({ isLoading: false }));
+            }
+          }
+        })
+      );
+
+      dispatch(
+        useSetCancelBtnCb({
+          useCancelBtnCb: () => {
+            dispatch(
+              useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
+            );
+            dispatch(useSetMessage({ message: '' }));
+            dispatch(useSetConfirmBtnCb({}));
+            dispatch(useSetCancelBtnCb({}));
+          }
+        })
+      );
+    },
+    []
+  );
+
+  return useUpdatePopupHook;
+};
+
+/**
+ * [데이터 삭제 팝업 훅]
+ *
+ * @param confirmBtnCb 성공 콜백
+ * @returns
+ */
+export const useDeletePopup = (confirmBtnCb: (params?: any) => any) => {
+  const dispatch = useDispatch();
+  const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
+
+  const useDeletePopupHook = useCallback(async (type: string, id: string) => {
+    dispatch(useSetMessage({ message: 'Are you sure you wanna delete?' }));
+    dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: true }));
+
+    dispatch(
+      useSetConfirmBtnCb({
+        useConfirmBtnCb: async () => {
+          try {
+            dispatch(useSetIsLoading({ isLoading: true }));
+            await deleteDoc(doc(db, type, id));
+            dispatch(
+              useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
+            );
+            dispatch(useSetConfirmBtnCb({}));
+            dispatch(useSetCancelBtnCb({}));
+            confirmBtnCb?.();
+          } catch (error: any) {
+            useSetCatchClauseForErrorPopup(error);
+          } finally {
+            dispatch(useSetIsLoading({ isLoading: false }));
+          }
+        }
+      })
+    );
+
+    dispatch(
+      useSetCancelBtnCb({
+        useCancelBtnCb: () => {
+          dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: false }));
+          dispatch(useSetMessage({ message: '' }));
+          dispatch(useSetConfirmBtnCb({}));
+          dispatch(useSetCancelBtnCb({}));
+        }
+      })
+    );
+  }, []);
+
+  return useDeletePopupHook;
+};

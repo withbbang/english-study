@@ -1,10 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { PropState } from 'middlewares/configureReducer';
 import { AuthState } from 'middlewares/reduxToolkits/authSlice';
 import { connect } from 'react-redux';
 import { Action } from 'redux';
-import { useDeleteData } from 'modules/firebaseHooks';
 import SVG from 'modules/SVG';
 import styles from './Card.module.scss';
 
@@ -29,7 +27,10 @@ function Card({
   onClickDelete
 }: typeCard): React.JSX.Element {
   return (
-    <div className={styles.wrap} onClick={(e) => onClick(e, id)}>
+    <div
+      className={styles.wrap}
+      onClick={(e) => onClick(e, id, id === '0' ? 'add' : 'view')}
+    >
       {type && (
         <div className={styles.floatCategory}>
           <span>
@@ -41,7 +42,9 @@ function Card({
       )}
       {uid !== undefined && uid !== null && uid !== '' && id !== '0' ? (
         <div className={styles.floatBtns}>
-          <span onClick={(e) => onClickUpdate && onClickUpdate(e, id)}>
+          <span
+            onClick={(e) => onClickUpdate && onClickUpdate(e, id, 'update')}
+          >
             <SVG type="modify" width="20px" height="20px" />
           </span>
           <span onClick={(e) => onClickDelete && onClickDelete(e, id)}>
@@ -76,10 +79,15 @@ interface typeCard extends AuthState {
   title: string;
   createDt?: string;
   type?: string;
-  onClick: (e: React.MouseEvent<HTMLElement, MouseEvent>, id: string) => void;
+  onClick: (
+    e: React.MouseEvent<HTMLElement, MouseEvent>,
+    id: string,
+    popupType: string
+  ) => void;
   onClickUpdate?: (
     e: React.MouseEvent<HTMLElement, MouseEvent>,
-    id: string
+    id: string,
+    popupType: string
   ) => void;
   onClickDelete?: (
     e: React.MouseEvent<HTMLElement, MouseEvent>,

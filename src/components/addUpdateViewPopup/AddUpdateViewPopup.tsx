@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import { TypeKeyValueForm } from 'modules/types';
-import { useChangeHook } from 'modules/customHooks';
 import styles from './AddUpdateViewPopup.module.scss';
 
 function AddUpdateViewPopup({
