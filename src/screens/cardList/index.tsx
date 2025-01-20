@@ -18,8 +18,9 @@ import {
   stopSpeech,
   startSpeech,
   splitContents,
-  ttsInit
-} from 'modules/ttsUtils';
+  ttsInit,
+  sttStart
+} from 'modules/speechUtils';
 import Back from 'components/back';
 import Card from 'components/card';
 import AddUpdateViewPopup from 'components/addUpdateViewPopup/AddUpdateViewPopup';
@@ -59,7 +60,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
     isActivePopup: false,
     xPos: -1,
     yPos: -1,
-    doesTtsWork: false
+    isDisabledTts: false,
+    isDisabledStt: false
   });
 
   useEffect(() => {
@@ -94,7 +96,9 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       popupType: '',
       isActivePopup: false,
       xPos: form.x,
-      yPos: form.y
+      yPos: form.y,
+      isDisabledTts: false,
+      isDisabledStt: false
     }));
   };
 
@@ -131,7 +135,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       isActivePopup: false,
       xPos: e.clientX,
       yPos: e.clientY,
-      doesTtsWork: false
+      isDisabledTts: false,
+      isDisabledStt: false
     }));
   };
 
@@ -177,20 +182,35 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
 
   // tts 시작
   const handleStartSpeech = () => {
-    if (!form.doesTtsWork)
+    if (!form.isDisabledTts)
       splitContents(`${form.contents}`).forEach((text) =>
         startSpeech(
           text,
-          () => setForm((prevState) => ({ ...prevState, doesTtsWork: true })),
-          () => setForm((prevState) => ({ ...prevState, doesTtsWork: false }))
+          () => setForm((prevState) => ({ ...prevState, isDisabledTts: true })),
+          () => setForm((prevState) => ({ ...prevState, isDisabledTts: false }))
         )
       );
   };
 
   // tts 정지
   const handleStopSpeech = () => {
-    setForm((prevState) => ({ ...prevState, doesTtsWork: false }));
+    setForm((prevState) => ({ ...prevState, isDisabledTts: false }));
     stopSpeech();
+  };
+
+  // stt 시작
+  const handleStartRecognition = () => {
+    if (!form.isDisabledStt) {
+      sttStart(
+        () => setForm((prevState) => ({ ...prevState, isDisabledStt: true })),
+        () => setForm((prevState) => ({ ...prevState, isDisabledStt: false })),
+        (text) =>
+          setForm((prevState) => ({
+            ...prevState,
+            contents: `${form.contents}\n${text}`
+          }))
+      );
+    }
   };
 
   return (
@@ -210,6 +230,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
         onClick={handleAddUpdateOkBtn}
         onStartSpeech={handleStartSpeech}
         onStopSpeech={handleStopSpeech}
+        onStartRecognition={handleStartRecognition}
       />
       <div className={styles.wrap}>
         <Back />

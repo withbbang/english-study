@@ -376,7 +376,7 @@ export function handleGetTitle(type: string): string {
     case 'spoken-language':
       return 'Spoken Language';
     case 'vocabulary':
-      return 'vocabulary';
+      return 'Vocabulary';
     default:
       return '';
   }

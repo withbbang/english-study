@@ -9,6 +9,8 @@ export interface TypeKeyValueForm {
  */
 export interface CustomWindow extends Window {
   webkit?: any;
+  SpeechRecognition?: any;
+  webkitSpeechRecognition?: any;
   goBack?: (data?: any) => any;
   onResult?: (data?: any) => any;
   onResume?: (data?: any) => any;

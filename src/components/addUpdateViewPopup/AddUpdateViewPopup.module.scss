@@ -76,7 +76,10 @@
   .btns {
     justify-content: space-evenly;
 
-    .ttsBtns {
+    .speechBtns {
+      display: flex;
+      align-items: center;
+
       > span {
         margin-right: 10px;
         cursor: pointer;

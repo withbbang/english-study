@@ -16,7 +16,8 @@ function AddUpdateViewPopup({
   onCloseCard,
   onClick,
   onStartSpeech,
-  onStopSpeech
+  onStopSpeech,
+  onStartRecognition
 }: TypeAddUpdateViewPopup): React.JSX.Element {
   const divRef = React.useRef(
     null
@@ -142,13 +143,18 @@ function AddUpdateViewPopup({
           </>
         )}
         <div className={styles.btns}>
-          <div className={styles.ttsBtns}>
+          <div className={styles.speechBtns}>
             <span onClick={onStartSpeech}>
               <SVG type="play" width="30px" height="30px" />
             </span>
             <span onClick={onStopSpeech}>
               <SVG type="stop" width="30px" height="30px" />
             </span>
+            {popupType !== 'view' && (
+              <span onClick={onStartRecognition}>
+                <SVG type="mike" width="25px" height="25px" />
+              </span>
+            )}
           </div>
           <button onClick={onClick}>OK</button>
         </div>
@@ -177,6 +183,7 @@ interface TypeAddUpdateViewPopup {
   onClick: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   onStartSpeech: () => void;
   onStopSpeech: () => void;
+  onStartRecognition: () => void;
 }
 
 export default AddUpdateViewPopup;
