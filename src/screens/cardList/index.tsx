@@ -212,13 +212,14 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       sttStart(
         () => setForm((prevState) => ({ ...prevState, isDisabledStt: true })),
         () => setForm((prevState) => ({ ...prevState, isDisabledStt: false })),
-        (text) =>
+        (text) => {
+          const txt = handleSetUpperCaseFirstCharacter(text);
+
           setForm((prevState) => ({
             ...prevState,
-            contents: !`${form.contents}`
-              ? handleSetUpperCaseFirstCharacter(text)
-              : `${form.contents}\n${handleSetUpperCaseFirstCharacter(text)}`
-          }))
+            contents: !`${form.contents}` ? txt : `${form.contents}\n${txt}`
+          }));
+        }
       );
     }
   };
