@@ -13,7 +13,7 @@ function App(): React.JSX.Element {
         <Route path="/" element={<Index />} />
         <Route path="/:type/list" element={<CardList />} />
         <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
+        {/* <Route path="/sign-up" element={<SignUp />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

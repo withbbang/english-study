@@ -16,7 +16,7 @@ function IndexPT({
         ) : (
           <>
             <button onClick={() => onMovePage('/sign-in')}>Sign In</button>
-            <button onClick={() => onMovePage('/sign-up')}>Sign Up</button>
+            {/* <button onClick={() => onMovePage('/sign-up')}>Sign Up</button> */}
           </>
         )}
       </div>

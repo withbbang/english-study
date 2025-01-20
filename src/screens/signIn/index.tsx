@@ -71,8 +71,11 @@ function SignIn({ uid }: TypeSignIn): React.JSX.Element {
           onChange={useChange}
           onKeyDown={useEnterKeyDown}
         />
-        <div className={styles.btns}>
+        {/* <div className={styles.btns}>
           <button onClick={() => navigate('/sign-up')}>Sign Up</button>
+          <button onClick={() => useLogin()}>Sign In</button>
+        </div> */}
+        <div className={styles.btns} style={{ justifyContent: 'end' }}>
           <button onClick={() => useLogin()}>Sign In</button>
         </div>
       </div>
