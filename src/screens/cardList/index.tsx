@@ -243,7 +243,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
           ) : (
             <>
               <button onClick={() => navigate('/sign-in')}>Sign In</button>
-              <button onClick={() => navigate('/sign-up')}>Sign Up</button>
+              {/* <button onClick={() => navigate('/sign-up')}>Sign Up</button> */}
             </>
           )}
         </div>
