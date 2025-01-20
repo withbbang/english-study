@@ -12,7 +12,10 @@ import {
   useUpdatePopup
 } from 'modules/firebaseHooks';
 import { useNavigate, useParams } from 'react-router-dom';
-import { handleGetTitle } from 'modules/utils';
+import {
+  handleGetTitle,
+  handleSetUpperCaseFirstCharacter
+} from 'modules/utils';
 import { useChangeHook } from 'modules/customHooks';
 import {
   stopSpeech,
@@ -146,9 +149,12 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   const handleAddUpdateOkBtn = (
     e: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
-    e.stopPropagation();
-
     let params: any;
+
+    if (uid === undefined || uid === null || uid === '') {
+      handleCloseCard(e);
+      return;
+    }
 
     if (type === 'diary')
       params = {
@@ -209,7 +215,9 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
         (text) =>
           setForm((prevState) => ({
             ...prevState,
-            contents: `${form.contents}\n${text}`
+            contents: !`${form.contents}`
+              ? text
+              : `${form.contents}\n${handleSetUpperCaseFirstCharacter(text)}`
           }))
       );
     }
@@ -251,9 +259,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
         </div>
         <h2>{handleGetTitle(type)}</h2>
         <div className={styles.innerWrap}>
-          {uid !== undefined && uid !== null && uid !== '' && (
-            <Card id={'0'} title={''} onClick={handleClickCard} />
-          )}
+          <Card id={'0'} title={''} onClick={handleClickCard} />
           {Array.isArray(datas) &&
             datas.length > 0 &&
             datas.map(({ id, title, createDt }: any) => (
