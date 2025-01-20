@@ -52,7 +52,7 @@ export const stopSpeech = () => window.speechSynthesis.cancel();
  * [stt 초기화]
  */
 export const sttInit = () => {
-  recognition.lang = 'en-US';
+  recognition.lang = VOICE_LANGUAGE;
   recognition.continuous = false;
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;

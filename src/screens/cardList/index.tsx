@@ -19,7 +19,8 @@ import {
   startSpeech,
   splitContents,
   ttsInit,
-  sttStart
+  sttStart,
+  sttInit
 } from 'modules/speechUtils';
 import Back from 'components/back';
 import Card from 'components/card';
@@ -77,6 +78,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
     else {
       useGetDatasHook();
       ttsInit();
+      sttInit();
     }
 
     return () => stopSpeech();
