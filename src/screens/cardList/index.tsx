@@ -216,7 +216,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
           setForm((prevState) => ({
             ...prevState,
             contents: !`${form.contents}`
-              ? text
+              ? handleSetUpperCaseFirstCharacter(text)
               : `${form.contents}\n${handleSetUpperCaseFirstCharacter(text)}`
           }))
       );
