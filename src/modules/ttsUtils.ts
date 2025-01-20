@@ -43,4 +43,5 @@ export const startSpeech = (
  */
 export const stopSpeech = () => window.speechSynthesis.cancel();
 
-export const splitContents = (contents: string) => contents.split(/[,|\n]/);
+export const splitContents = (contents: string) =>
+  contents.split(/[?\n|!\n|.\n|\n]/);

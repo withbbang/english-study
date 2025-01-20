@@ -37,6 +37,11 @@
     flex: 1;
     align-items: center;
     box-sizing: border-box;
+  }
+
+  .content {
+    margin-bottom: 20px;
+    justify-content: space-between;
 
     > label {
       width: 100%;
@@ -44,31 +49,22 @@
       font-size: 0.9rem;
 
       > input,
-      textarea,
-      a {
+      textarea {
         width: 100%;
         padding: 5px;
         font-size: 0.8rem;
         resize: none;
         box-sizing: border-box;
-      }
 
-      > a {
-        word-break: break-all;
+        &:not(:first-child) {
+          margin-top: 5px;
+        }
       }
 
       > textarea {
         display: flex;
         height: 200px;
       }
-    }
-  }
-
-  .content {
-    justify-content: space-between;
-
-    > label {
-      width: 100%;
     }
 
     .title {
@@ -112,7 +108,7 @@
         > input,
         textarea {
           &:disabled {
-            border: none;
+            border: solid 0.1px $less-dark;
             color: $more-dark;
             font-size: 0.9rem;
             background-color: $more-light;

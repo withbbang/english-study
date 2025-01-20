@@ -3,8 +3,11 @@ import SVG from 'modules/SVG';
 import styles from './AddUpdateViewPopup.module.scss';
 
 function AddUpdateViewPopup({
+  type,
   title,
   contents,
+  enEn,
+  enKo,
   isActive,
   popupType,
   xPos,
@@ -18,9 +21,6 @@ function AddUpdateViewPopup({
   const divRef = React.useRef(
     null
   ) as React.MutableRefObject<HTMLDivElement | null>;
-  const textAreaRef = React.useRef(
-    null
-  ) as React.MutableRefObject<HTMLTextAreaElement | null>;
 
   useEffect(() => {
     if (isActive) handleActivePopup();
@@ -82,25 +82,65 @@ function AddUpdateViewPopup({
             <input
               id="title"
               name="title"
-              value={`${title}`}
+              value={title}
               onChange={useChange}
               disabled={popupType === 'view'}
             />
           </label>
         </div>
-        <div className={styles.content}>
-          <label htmlFor="contents">
-            Contents
-            <br />
-            <textarea
-              name="contents"
-              ref={textAreaRef}
-              value={`${contents}`}
-              onChange={useChange}
-              disabled={popupType === 'view'}
-            />
-          </label>
-        </div>
+        {type === 'diary' ? (
+          <div className={styles.content}>
+            <label htmlFor="contents">
+              Contents
+              <br />
+              <textarea
+                name="contents"
+                value={contents}
+                onChange={useChange}
+                disabled={popupType === 'view'}
+              />
+            </label>
+          </div>
+        ) : (
+          <>
+            <div className={styles.content}>
+              <label htmlFor="enEn">
+                English-English
+                <br />
+                <input
+                  name="enEn"
+                  value={enEn}
+                  onChange={useChange}
+                  disabled={popupType === 'view'}
+                />
+              </label>
+            </div>
+            <div className={styles.content}>
+              <label htmlFor="enKo">
+                English-Korean
+                <br />
+                <input
+                  name="enKo"
+                  value={enKo}
+                  onChange={useChange}
+                  disabled={popupType === 'view'}
+                />
+              </label>
+            </div>
+            <div className={styles.content}>
+              <label htmlFor="contents">
+                Example
+                <br />
+                <textarea
+                  name="contents"
+                  value={contents}
+                  onChange={useChange}
+                  disabled={popupType === 'view'}
+                />
+              </label>
+            </div>
+          </>
+        )}
         <div className={styles.btns}>
           <div className={styles.ttsBtns}>
             <span onClick={onStartSpeech}>
@@ -118,8 +158,11 @@ function AddUpdateViewPopup({
 }
 
 interface TypeAddUpdateViewPopup {
+  type: string;
   title: string;
   contents: string;
+  enEn: string;
+  enKo: string;
   isActive: boolean;
   popupType?: string;
   xPos?: number;

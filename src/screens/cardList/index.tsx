@@ -44,20 +44,16 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   const useDeletePopupHook = useDeletePopup(() => handleSuccessCb());
   const { datas, useGetDatasHook } = useGetDatas(type);
   const { useGetDataHook } = useGetData((response) => {
-    console.log(response);
     setForm((prevState) => ({
       ...prevState,
-      title: response.title,
-      contents: response.contents
+      ...response
     }));
   });
   const { form, setForm, useChange } = useChangeHook({
     title: '',
     contents: '',
-    'en-en': '',
-    'en-ko': '',
-    examples: '',
-    example: '',
+    enEn: '',
+    enKo: '',
     selectedId: '',
     popupType: '',
     isActivePopup: false,
@@ -80,6 +76,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       useGetDatasHook();
       ttsInit();
     }
+
+    return () => stopSpeech();
   }, []);
 
   // api 호출 후 콜백
@@ -90,10 +88,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       ...prevState,
       title: '',
       contents: '',
-      'en-en': '',
-      'en-ko': '',
-      examples: '',
-      example: '',
+      enEn: '',
+      enKo: '',
       selectedId: '',
       popupType: '',
       isActivePopup: false,
@@ -128,10 +124,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       ...prevState,
       title: '',
       contents: '',
-      'en-en': '',
-      'en-ko': '',
-      examples: '',
-      example: '',
+      enEn: '',
+      enKo: '',
       selectedId: '',
       popupType: '',
       isActivePopup: false,
@@ -154,25 +148,12 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
         title: form.title,
         contents: form.contents
       };
-    else if (type === 'making-use-of')
+    else
       params = {
         title: form.title,
-        'en-en': form['en-en'],
-        'en-ko': form['en-ko'],
-        examples: form.examples
-      };
-    else if (type === 'spoken-language')
-      params = {
-        title: form.title,
-        'en-en': form['en-en'],
-        'en-ko': form['en-ko'],
-        example: form.example
-      };
-    else if (type === 'vocabulary')
-      params = {
-        title: form.title,
-        'en-en': form['en-en'],
-        'en-ko': form['en-ko']
+        enEn: form.enEn,
+        enKo: form.enKo,
+        contents: form.contents
       };
 
     if (form.popupType === 'add') {
@@ -215,8 +196,11 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   return (
     <>
       <AddUpdateViewPopup
+        type={type}
         title={`${form.title}`}
         contents={`${form.contents}`}
+        enEn={`${form.enEn}`}
+        enKo={`${form.enKo}`}
         popupType={`${form.popupType}`}
         isActive={!!form.isActivePopup}
         xPos={+form.xPos}

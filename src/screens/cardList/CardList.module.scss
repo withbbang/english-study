@@ -3,9 +3,8 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
-  padding-top: 40px;
+  padding-top: 100px;
   @include background($more-light);
 
   .signBtns {
