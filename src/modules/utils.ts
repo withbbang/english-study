@@ -386,6 +386,8 @@ export function handleGetTitle(type: string): string {
       return 'Spoken Language';
     case 'vocabulary':
       return 'Vocabulary';
+    case 'hard-to-speak-phrase':
+      return 'Hard To Speak Phrase';
     default:
       return '';
   }

@@ -40,6 +40,11 @@ function IndexPT({
             Vocabulary
           </button>
         </div>
+        <div>
+          <button onClick={() => onMovePage('/hard-to-speak-phrase/list')}>
+            Hard To Speak Phrase
+          </button>
+        </div>
       </div>
     </div>
   );

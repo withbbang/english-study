@@ -11,9 +11,10 @@
 ### 카테고리 설명
 
 - Diary: 영어 일기장
-- Vocabulary: 단어 정리
-- Spoken-Language: 구어 정리
 - Making-use-of: 응용 정리
+- Spoken-Language: 구어 정리
+- Vocabulary: 단어 정리
+- Hard-To-Speak-Phrase: 소리내서 말하기 어려운 구문
 
 ---
 

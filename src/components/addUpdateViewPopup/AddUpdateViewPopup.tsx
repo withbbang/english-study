@@ -89,7 +89,7 @@ function AddUpdateViewPopup({
             />
           </label>
         </div>
-        {type === 'diary' ? (
+        {type === 'diary' || type === 'hard-to-speak-phrase' ? (
           <div className={styles.content}>
             <label htmlFor="contents">
               Contents

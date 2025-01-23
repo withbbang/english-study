@@ -74,7 +74,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
         type === 'diary' ||
         type === 'making-use-of' ||
         type === 'spoken-language' ||
-        type === 'vocabulary'
+        type === 'vocabulary' ||
+        type === 'hard-to-speak-phrase'
       )
     )
       navigate('/not-found', { replace: true });
@@ -156,7 +157,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       return;
     }
 
-    if (type === 'diary')
+    if (type === 'diary' || type === 'hard-to-speak-phrase')
       params = {
         title: form.title,
         contents: form.contents
