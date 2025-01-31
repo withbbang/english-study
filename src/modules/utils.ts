@@ -344,12 +344,12 @@ export function handleConvertTimestamp(
       return `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(
         2,
         '0'
-      )}-${`${date.getDate() + 1}`.padStart(2, '0')}`;
+      )}-${`${date.getDate()}`.padStart(2, '0')}`;
     case 'yyyyMMdd':
       return `${date.getFullYear()}${`${date.getMonth() + 1}`.padStart(
         2,
         '0'
-      )}${`${date.getDate() + 1}`.padStart(2, '0')}`;
+      )}${`${date.getDate()}`.padStart(2, '0')}`;
     case 'yyyyMMddhhmmss':
       const handleSetPadZero = (value: number) =>
         value < 10 ? `0${value}` : value;
