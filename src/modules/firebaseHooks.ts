@@ -146,8 +146,8 @@ export function useCheckAuthStateChanged(successCb?: () => any) {
 /**
  * [데이터들 조회]
  *
- * @param {Function | undefined} successCb 성공 콜백
  * @param {string} type 타입
+ * @param {Function | undefined} successCb 성공 콜백
  */
 export function useGetDatas(type: string, successCb?: (response?: any) => any) {
   const dispatch = useDispatch();
@@ -304,42 +304,47 @@ export const useAddPopup = (confirmBtnCb: (params?: any) => any) => {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
 
-  const useAddPopupHook = useCallback(async (type: string, params?: any) => {
-    dispatch(useSetMessage({ message: 'Are you sure you wanna add?' }));
-    dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: true }));
+  const useAddPopupHook = useCallback(
+    async (type: string, params?: any) => {
+      dispatch(useSetMessage({ message: 'Are you sure you wanna add?' }));
+      dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: true }));
 
-    dispatch(
-      useSetConfirmBtnCb({
-        useConfirmBtnCb: async () => {
-          try {
-            dispatch(useSetIsLoading({ isLoading: true }));
-            await addDoc(collection(db, type), params);
+      dispatch(
+        useSetConfirmBtnCb({
+          useConfirmBtnCb: async () => {
+            try {
+              dispatch(useSetIsLoading({ isLoading: true }));
+              await addDoc(collection(db, type), params);
+              dispatch(
+                useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
+              );
+              dispatch(useSetConfirmBtnCb({}));
+              dispatch(useSetCancelBtnCb({}));
+              confirmBtnCb?.();
+            } catch (error: any) {
+              useSetCatchClauseForErrorPopup(error);
+            } finally {
+              dispatch(useSetIsLoading({ isLoading: false }));
+            }
+          }
+        })
+      );
+
+      dispatch(
+        useSetCancelBtnCb({
+          useCancelBtnCb: () => {
             dispatch(
               useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
             );
+            dispatch(useSetMessage({ message: '' }));
             dispatch(useSetConfirmBtnCb({}));
             dispatch(useSetCancelBtnCb({}));
-            confirmBtnCb?.();
-          } catch (error: any) {
-            useSetCatchClauseForErrorPopup(error);
-          } finally {
-            dispatch(useSetIsLoading({ isLoading: false }));
           }
-        }
-      })
-    );
-
-    dispatch(
-      useSetCancelBtnCb({
-        useCancelBtnCb: () => {
-          dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: false }));
-          dispatch(useSetMessage({ message: '' }));
-          dispatch(useSetConfirmBtnCb({}));
-          dispatch(useSetCancelBtnCb({}));
-        }
-      })
-    );
-  }, []);
+        })
+      );
+    },
+    [confirmBtnCb]
+  );
 
   return useAddPopupHook;
 };
@@ -393,7 +398,7 @@ export const useUpdatePopup = (confirmBtnCb: (params?: any) => any) => {
         })
       );
     },
-    []
+    [confirmBtnCb]
   );
 
   return useUpdatePopupHook;
@@ -409,42 +414,47 @@ export const useDeletePopup = (confirmBtnCb: (params?: any) => any) => {
   const dispatch = useDispatch();
   const useSetCatchClauseForErrorPopup = useSetCatchClauseForErrorPopupHook();
 
-  const useDeletePopupHook = useCallback(async (type: string, id: string) => {
-    dispatch(useSetMessage({ message: 'Are you sure you wanna delete?' }));
-    dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: true }));
+  const useDeletePopupHook = useCallback(
+    async (type: string, id: string) => {
+      dispatch(useSetMessage({ message: 'Are you sure you wanna delete?' }));
+      dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: true }));
 
-    dispatch(
-      useSetConfirmBtnCb({
-        useConfirmBtnCb: async () => {
-          try {
-            dispatch(useSetIsLoading({ isLoading: true }));
-            await deleteDoc(doc(db, type, id));
+      dispatch(
+        useSetConfirmBtnCb({
+          useConfirmBtnCb: async () => {
+            try {
+              dispatch(useSetIsLoading({ isLoading: true }));
+              await deleteDoc(doc(db, type, id));
+              dispatch(
+                useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
+              );
+              dispatch(useSetConfirmBtnCb({}));
+              dispatch(useSetCancelBtnCb({}));
+              confirmBtnCb?.();
+            } catch (error: any) {
+              useSetCatchClauseForErrorPopup(error);
+            } finally {
+              dispatch(useSetIsLoading({ isLoading: false }));
+            }
+          }
+        })
+      );
+
+      dispatch(
+        useSetCancelBtnCb({
+          useCancelBtnCb: () => {
             dispatch(
               useSetIsConfirmPopupActive({ isConfirmPopupActive: false })
             );
+            dispatch(useSetMessage({ message: '' }));
             dispatch(useSetConfirmBtnCb({}));
             dispatch(useSetCancelBtnCb({}));
-            confirmBtnCb?.();
-          } catch (error: any) {
-            useSetCatchClauseForErrorPopup(error);
-          } finally {
-            dispatch(useSetIsLoading({ isLoading: false }));
           }
-        }
-      })
-    );
-
-    dispatch(
-      useSetCancelBtnCb({
-        useCancelBtnCb: () => {
-          dispatch(useSetIsConfirmPopupActive({ isConfirmPopupActive: false }));
-          dispatch(useSetMessage({ message: '' }));
-          dispatch(useSetConfirmBtnCb({}));
-          dispatch(useSetCancelBtnCb({}));
-        }
-      })
-    );
-  }, []);
+        })
+      );
+    },
+    [confirmBtnCb]
+  );
 
   return useDeletePopupHook;
 };

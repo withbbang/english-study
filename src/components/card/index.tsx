@@ -22,14 +22,14 @@ function Card({
   title,
   createDt,
   type = '',
-  onClick,
+  onClickCard,
   onClickUpdate,
   onClickDelete
 }: typeCard): React.JSX.Element {
   return (
     <div
       className={styles.wrap}
-      onClick={(e) => onClick(e, id, id === '0' ? 'add' : 'view')}
+      onClick={(e) => onClickCard(e, id, id === '0' ? 'add' : 'view')}
     >
       {type && (
         <div className={styles.floatCategory}>
@@ -79,7 +79,7 @@ interface typeCard extends AuthState {
   title: string;
   createDt?: string;
   type?: string;
-  onClick: (
+  onClickCard: (
     e: React.MouseEvent<HTMLElement, MouseEvent>,
     id: string,
     popupType: string

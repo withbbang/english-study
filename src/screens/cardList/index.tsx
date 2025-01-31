@@ -11,12 +11,13 @@ import {
   useSignOut,
   useUpdatePopup
 } from 'modules/firebaseHooks';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
+  history,
   handleGetTitle,
   handleSetUpperCaseFirstCharacter
 } from 'modules/utils';
-import { useChangeHook } from 'modules/customHooks';
+import { useChangeHook, useInitPopupHook } from 'modules/customHooks';
 import {
   stopSpeech,
   startSpeech,
@@ -42,8 +43,10 @@ function mapDispatchToProps(dispatch: (actionFunction: Action<any>) => any) {
 
 function CardList({ uid }: typeCardList): React.JSX.Element {
   const { type = '' } = useParams();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const useSignOutHook = useSignOut();
+  const useInitPopup = useInitPopupHook();
   const useAddPopupHook = useAddPopup(() => handleSuccessCb());
   const useUpdatePopupHook = useUpdatePopup(() => handleSuccessCb());
   const useDeletePopupHook = useDeletePopup(() => handleSuccessCb());
@@ -85,27 +88,27 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       sttInit();
     }
 
-    return () => stopSpeech();
+    return () => {
+      stopSpeech();
+      useInitPopup();
+    };
+  }, []);
+
+  useEffect(() => {
+    const backEvent = history.listen(({ action }) => {
+      if (action === 'POP') {
+        handleCloseCard();
+        useInitPopup();
+      }
+    });
+
+    return backEvent;
   }, []);
 
   // api 호출 후 콜백
   const handleSuccessCb = () => {
     useGetDatasHook();
-    stopSpeech();
-    setForm((prevState) => ({
-      ...prevState,
-      title: '',
-      contents: '',
-      enEn: '',
-      enKo: '',
-      selectedId: '',
-      popupType: '',
-      isActivePopup: false,
-      xPos: form.x,
-      yPos: form.y,
-      isDisabledTts: false,
-      isDisabledStt: false
-    }));
+    handleCloseCard();
   };
 
   // 카드 클릭 콜백
@@ -116,7 +119,10 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   ) => {
     e.stopPropagation();
 
+    history.push(pathname);
+
     if (id !== '0') useGetDataHook(type, id);
+
     setForm((prevState) => ({
       ...prevState,
       selectedId: id,
@@ -128,7 +134,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
   };
 
   // 카드 닫기
-  const handleCloseCard = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+  const handleCloseCard = (e?: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    if (form.isActivePopup) navigate(-1);
     stopSpeech();
     setForm((prevState) => ({
       ...prevState,
@@ -139,8 +146,8 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
       selectedId: '',
       popupType: '',
       isActivePopup: false,
-      xPos: e.clientX,
-      yPos: e.clientY,
+      xPos: e ? e.clientX : form.x,
+      yPos: e ? e.clientY : form.y,
       isDisabledTts: false,
       isDisabledStt: false
     }));
@@ -261,7 +268,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
         </div>
         <h2>{handleGetTitle(type)}</h2>
         <div className={styles.innerWrap}>
-          <Card id={'0'} title={''} onClick={handleClickCard} />
+          <Card id={'0'} title={''} onClickCard={handleClickCard} />
           {Array.isArray(datas) &&
             datas.length > 0 &&
             datas.map(({ id, title, createDt }: any) => (
@@ -271,7 +278,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
                 title={title}
                 createDt={createDt}
                 type={type}
-                onClick={handleClickCard}
+                onClickCard={handleClickCard}
                 onClickUpdate={handleClickCard}
                 onClickDelete={handleClickDelete}
               />

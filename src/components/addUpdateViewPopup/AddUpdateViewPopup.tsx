@@ -179,7 +179,7 @@ interface TypeAddUpdateViewPopup {
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => void;
-  onCloseCard: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+  onCloseCard: (e?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   onClick: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   onStartSpeech: () => void;
   onStopSpeech: () => void;
