@@ -45,6 +45,11 @@ function IndexPT({
             Hard To Speak Phrase
           </button>
         </div>
+        <div>
+          <button onClick={() => onMovePage('/spontaneous-writing/list')}>
+            Spontaneous Writing
+          </button>
+        </div>
       </div>
     </div>
   );

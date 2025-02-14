@@ -391,6 +391,8 @@ export function handleGetTitle(type: string): string {
       return 'Vocabulary';
     case 'hard-to-speak-phrase':
       return 'Hard To Speak Phrase';
+    case 'spontaneous-writing':
+      return 'Spontaneous Writing';
     default:
       return '';
   }

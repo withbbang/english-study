@@ -15,6 +15,7 @@
 - Spoken-Language: 구어 정리
 - Vocabulary: 단어 정리
 - Hard-To-Speak-Phrase: 소리내서 말하기 어려운 구문
+- Spontaneous-Writing: 즉흥적으로 작문하고 싶은 문구
 
 ---
 
