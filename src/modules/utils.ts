@@ -407,3 +407,21 @@ export function handleCheckEmail(email: string): boolean {
   // eslint-disable-next-line
   return /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-za-z0-9\-]+/.test(email);
 }
+
+/**
+ * 빈 파라미터 체크 함수
+ * @param params 검사할 파라미터
+ * @param cb 성공시 콜백 함수
+ */
+export function handleCheckEmpty(params: any, cb: Function) {
+  if (
+    params !== undefined &&
+    params !== null &&
+    params !== ''
+    // params === false &&
+    // params === 0 &&
+    // Number.isNaN(params)
+  ) {
+    cb();
+  }
+}

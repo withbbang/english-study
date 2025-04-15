@@ -15,7 +15,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   history,
   handleGetTitle,
-  handleSetUpperCaseFirstCharacter
+  handleSetUpperCaseFirstCharacter,
+  handleCheckEmpty
 } from 'modules/utils';
 import { useChangeHook, useInitPopupHook } from 'modules/customHooks';
 import {
@@ -84,7 +85,7 @@ function CardList({ uid }: typeCardList): React.JSX.Element {
     )
       navigate('/not-found', { replace: true });
     else {
-      useGetDatasHook();
+      handleCheckEmpty(uid, useGetDatasHook);
       ttsInit();
       sttInit();
     }
